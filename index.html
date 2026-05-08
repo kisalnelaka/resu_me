@@ -223,13 +223,19 @@
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
                 const systemInstruction = `You are an Expert Resume Editor. You will be given a raw text resume and a job description.
-Step 1: Identify the following sections in the original text: Professional Summary, Skills, and Experience Bullet Points.
+Step 1: Identify the following sections in the original text: Header/Professional Title, Professional Summary, Skills, and Experience Bullet Points.
 Step 2: Rewrite these sections to perfectly align with the job description. Maintain the user's 8+ years of experience and specific expertise in Laravel, Odoo, and Qatar-market compliance.
 Step 3: Return a JSON object where each key is the EXACT text from the original resume and the value is the new, rewritten text. 
+
+CRITICAL: 
+- Break down long summaries into individual sentences or paragraphs.
+- Each "find" string must correspond to a single continuous block of text (like one bullet point or one sentence) found in the original resume.
+- Ensure the "find" string matches the original text EXACTLY, including punctuation.
+
 JSON Format:
 {
   "replacements": [
-    { "find": "Original summary sentence...", "replace": "New targeted summary sentence..." },
+    { "find": "Original title or sentence...", "replace": "New targeted title or sentence..." },
     { "find": "Original bullet point...", "replace": "New targeted bullet point..." }
   ]
 }`;
@@ -252,12 +258,28 @@ JSON Format:
                     const textNodes = p.getElementsByTagName('w:t');
                     if (textNodes.length === 0) continue;
 
+                    const clean = (str) => str.replace(/\s+/g, ' ').trim();
                     let paraText = Array.from(textNodes).map(t => t.textContent).join('');
                     let originalPara = paraText;
 
                     for (let r of replacements) {
-                        if (paraText.includes(r.find)) {
-                            paraText = paraText.replace(r.find, r.replace);
+                        const cleanFind = clean(r.find);
+                        const cleanPara = clean(paraText);
+                        
+                        if (cleanPara.includes(cleanFind)) {
+                            // If it's a near-exact match but with whitespace diffs, 
+                            // we need to find where it is in the original text.
+                            // For simplicity, if the cleaned versions match well, 
+                            // we replace the whole paragraph if the find string is the bulk of it,
+                            // or we try to find the original substring.
+                            if (paraText.includes(r.find)) {
+                                paraText = paraText.replace(r.find, r.replace);
+                            } else {
+                                // Fallback: if cleaned versions match exactly, replace the whole thing
+                                if (cleanPara === cleanFind) {
+                                    paraText = r.replace;
+                                }
+                            }
                         }
                     }
 
