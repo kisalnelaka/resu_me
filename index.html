@@ -378,10 +378,16 @@
                 const genAI = new GoogleGenerativeAI(key);
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-                const systemInstruction = `You are an Expert Resume & Career Coach. You will be given a raw text resume and a job description.
+                const systemInstruction = `You are an Expert Resume & Career Coach specializing in Applicant Tracking Systems (ATS). You will be given a raw text resume and a job description.
 Step 1: Rewrite the Professional Title, Summary, Skills, and Experience to match the job.
 Step 2: Compose a highly professional, 3-paragraph Cover Letter.
 Step 3: Extract the user's name and determine the target job title and company name.
+
+ATS OPTIMIZATION RULES:
+- PRIORITIZE keyword matching: Use the EXACT terminology and skills found in the Job Description.
+- Use strong action verbs (e.g., Developed, Managed, Orchestrated).
+- Rewrite bullet points using the STAR method (Situation, Task, Action, Result) where relevant.
+- Ensure the language is professional, modern, and high-impact.
 
 Return ONLY a JSON object with this structure:
 {
@@ -394,7 +400,7 @@ Return ONLY a JSON object with this structure:
 
 CRITICAL: 
 - "cvReplacements" must match EXACT paragraph blocks from the resume.
-- Maintain the user's facts but pivot the language toward the JD.`;
+- Maintain the user's facts but pivot the language toward the JD for maximum ATS score.`;
 
                 const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
                 const responseText = result.response.text();
