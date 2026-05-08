@@ -8,7 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.1/docx.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -457,30 +456,34 @@ CRITICAL:
             }
         };
 
-        // --- Document Generation ---
+        // --- Document Generation (Library-Free Approach) ---
         async function generateCoverLetterDoc(text, name) {
-            // Robust check for docx library
-            let docxLib = null;
-            if (typeof window.docx !== 'undefined') docxLib = window.docx;
-            else if (typeof docx !== 'undefined') docxLib = docx;
-
-            if (!docxLib) throw new Error("Docx library failed to load. Please check your internet connection or try refreshing.");
+            // A minimal base64 encoded empty docx structure
+            const minDocxBase64 = "UEsDBBQAAAAIAAAAIQAn7pYBAAAAOwEAAAsAAABbQ29udGVudF9UeXBlc10ueG1sjM89SwNBEAbge79iubvYmEshInKFFALWlhYp7O6I7LIn7t0L8fPrO0SxtLCZeafeeXpS7ZpTMMpInL0vI8uYAFvP2fXW8/Vj88KMAZbe0fsS67kjFfX7eX96vSSTm7h5z6pM0UaU0fUasqMAnW68N7pREx4Xm9iFvYn93DoyXAnE6Uu5O6qEon8SHe493W4NfF1vYmfiM7p/Y6e6v35O/mBv0u6oEvrXRIcH1OatInyY3M8GNDuuhIIn9OatIpzYn5R/Ymd7vH78pPrN7l5z/wFQSwMEFAAAAAgAAAAhALp0btYAAAAAAQAAAwAAAF9yZWxzLy5yZWxzhI/NCsIwDMDvgu8QcruZdxGS6E6E3S66vYFpYpPGrf1L7+4NREH07CH58iU57U6eNSUf2Mlc66CpaYvV8T7pXpNoMpuE9CIdrOhADXv6fXW3U6RmMp/E0SIVWpG66uX89Xp0pCY8LxZxMkkV6UXvU8uOAnT66f3pRrNfN5M4mfiM9p/Zqe4vX5Lf0Zu0XaqE7lWf0D9KSwMEFAAAAAgAAAAhAK+C89QFAAAAGQwAABIAAAB3b3JkL2RvY3VtZW50LnhtbJ2Uy07DMBCG70i8Q+S7idMCHaiKK1AgpB64vEmcNpXjR7ZDS3h6Jm0KhYByInu8O//8O/HstG07U7QRnLV0mRTMJBqBtcyYulymf9vL9pIZB0pLZiwtp2SHTXraz6er7Uq96w7OEnX3A63mU7I6X7mK6rSArzVzBsqhGkOQpW8e7RAt9f2y8E67EPrW7K0B1P6hVf05+Z29ybrDKvHviZYPqN2dIn6QPK6X5DfI40pIfoM8rodksP1Z+Uf2O+N+Vv7B7vI/A9RSwECLQAUAAAACAAAACEAJ+6WAQAAADsBAAALAAsAAAAAAAAAAQAgAAAAAAAAAFtDb250ZW50X1R5cGVzXS54bWxQSwECLQAUAAAACAAAACEAunRu1gAAAAABAAADAAALAAwAAAAAAAAAAQAgAAAAUQAAAF9yZWxzLy5yZWxzUEsBAi0AFAAAAAgAAAAhAK+C89QFAAAAGQwAABIALAAAAAAAAAABACAAAACFAAAAd29yZC9kb2N1bWVudC54bWxQSwUGAAAAAAMAAwCLAQAAHAUAAAAA";
             
-            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docxLib;
-            const doc = new Document({
-                sections: [{
-                    properties: {},
-                    children: [
-                        new Paragraph({ text: name, heading: HeadingLevel.HEADING_1 }),
-                        new Paragraph({ text: new Date().toLocaleDateString(), spacing: { before: 200, after: 400 } }),
-                        ...text.split('\n').map(line => new Paragraph({
-                            children: [new TextRun(line)],
-                            spacing: { after: 200 }
-                        }))
-                    ],
-                }],
-            });
-            return await Packer.toBlob(doc);
+            const zip = new window.PizZip(minDocxBase64, { base64: true });
+            let xml = zip.file("word/document.xml").asText();
+            
+            // Clean and format text for XML
+            const cleanName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const cleanText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            const xmlParagraphs = cleanText.split('\n').map(line => {
+                if (!line.trim()) return '<w:p/>';
+                return `<w:p><w:r><w:t>${line}</w:t></w:r></w:p>`;
+            }).join('');
+
+            const finalXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+                <w:body>
+                    <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>${cleanName}</w:t></w:r></w:p>
+                    <w:p><w:r><w:t>${new Date().toLocaleDateString()}</w:t></w:r></w:p>
+                    ${xmlParagraphs}
+                </w:body>
+            </w:document>`;
+
+            zip.file("word/document.xml", finalXml);
+            return zip.generate({ type: "blob" });
         }
 
         // --- Action Handlers ---
