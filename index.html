@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.2.2/build/index.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -247,10 +247,13 @@
                         </button>
                     </div>
 
-                    <div id="actionSuccess" class="hidden space-y-6">
-                        <div class="flex items-center gap-3 text-green-400 font-medium justify-center mb-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            Optimization Complete
+                    <div id="actionSuccess" class="hidden space-y-6 text-center">
+                        <div class="flex flex-col items-center gap-2 mb-6">
+                            <div class="w-12 h-12 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-semibold">Ready for Download</h3>
+                            <p class="text-slate-400 text-sm italic">Always verify facts and formatting in Word or Google Docs before applying.</p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <button id="downloadCvBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
@@ -262,11 +265,7 @@
                                 Download Cover Letter
                             </button>
                         </div>
-                        <button id="previewBtn" class="w-full bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                            Preview & Proofread
-                        </button>
-                        <button onclick="location.reload()" class="w-full text-slate-500 hover:text-slate-400 text-sm font-medium">
+                        <button onclick="location.reload()" class="w-full text-slate-500 hover:text-slate-400 text-sm font-medium mt-4">
                             Start New Optimization
                         </button>
                     </div>
@@ -285,34 +284,6 @@
         </div>
 
         </footer>
-    </div>
-
-    <!-- Preview Modal -->
-    <div id="previewModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex flex-col p-4 md:p-8">
-        <div class="max-w-4xl mx-auto w-full flex flex-col h-full">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex gap-4">
-                    <button id="showCvPreview" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">CV Preview</button>
-                    <button id="showClPreview" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold border border-white/5 hover:border-white/20 transition-all">Cover Letter Preview</button>
-                </div>
-                <button id="closePreview" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div class="flex-1 glass-card overflow-hidden flex flex-col p-8 border-white/10 shadow-2xl">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-slate-200" id="previewTitle">Optimized CV Text</h3>
-                    <span class="text-xs text-slate-500 bg-white/5 px-2 py-1 rounded">Content Editable</span>
-                </div>
-                <div id="previewArea" contenteditable="true" class="flex-1 overflow-y-auto text-slate-300 leading-relaxed font-light focus:outline-none pr-4 scroll-smooth">
-                    <!-- Dynamic Content -->
-                </div>
-                <div class="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
-                    <p class="text-xs text-slate-500 max-w-md">Edit text directly to fix typos. Note: Formatting changes here only affect the downloaded text content.</p>
-                    <button id="saveChanges" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-all">Apply to Downloads</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Logic -->
@@ -336,27 +307,16 @@
             actionPrimary: document.getElementById('actionPrimary'),
             actionSuccess: document.getElementById('actionSuccess'),
             downloadCvBtn: document.getElementById('downloadCvBtn'),
-            downloadClBtn: document.getElementById('downloadClBtn'),
-            previewBtn: document.getElementById('previewBtn'),
-            previewModal: document.getElementById('previewModal'),
-            closePreview: document.getElementById('closePreview'),
-            previewArea: document.getElementById('previewArea'),
-            previewTitle: document.getElementById('previewTitle'),
-            showCvPreview: document.getElementById('showCvPreview'),
-            showClPreview: document.getElementById('showClPreview'),
-            saveChanges: document.getElementById('saveChanges')
+            downloadClBtn: document.getElementById('downloadClBtn')
         };
 
         let state = {
             selectedFile: null,
             cvBlob: null,
             clBlob: null,
-            cvText: '',
-            clText: '',
             userName: '',
             targetTitle: '',
-            companyName: '',
-            activePreview: 'cv' // 'cv' or 'cl'
+            companyName: ''
         };
 
         // Persistence
@@ -445,7 +405,6 @@ CRITICAL:
                 state.userName = aiData.userName;
                 state.targetTitle = aiData.targetTitle;
                 state.companyName = aiData.companyName;
-                state.clText = aiData.coverLetter;
 
                 updateProgress(70, 'Performing Smart Swaps in CV XML...');
                 const zip = new window.PizZip(arrayBuffer);
@@ -480,13 +439,9 @@ CRITICAL:
 
                 zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
                 state.cvBlob = zip.generate({ type: "blob" });
-                
-                // Get updated CV text for preview
-                const { value: optimizedCvText } = await window.mammoth.extractRawText({ arrayBuffer: await state.cvBlob.arrayBuffer() });
-                state.cvText = optimizedCvText;
 
                 updateProgress(90, 'Generating Cover Letter document...');
-                state.clBlob = await generateCoverLetterDoc(state.clText, state.userName);
+                state.clBlob = await generateCoverLetterDoc(aiData.coverLetter, state.userName);
 
                 updateProgress(100, 'All Documents Ready!');
                 setTimeout(() => {
@@ -504,7 +459,11 @@ CRITICAL:
 
         // --- Document Generation ---
         async function generateCoverLetterDoc(text, name) {
-            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+            // Fix for docx library reference
+            const docxLib = window.docx || docx;
+            if (!docxLib) throw new Error("Docx library failed to load. Please check your internet connection.");
+            
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docxLib;
             const doc = new Document({
                 sections: [{
                     properties: {},
@@ -533,44 +492,6 @@ CRITICAL:
             const company = (state.companyName || 'Company').replace(/[^a-z0-9]/gi, '_');
             const title = (state.targetTitle || 'Position').replace(/[^a-z0-9]/gi, '_');
             window.saveAs(state.clBlob, `${name}-${company}-${title}.docx`);
-        };
-
-        // --- Preview Logic ---
-        elements.previewBtn.onclick = () => {
-            elements.previewModal.classList.remove('hidden');
-            updatePreviewContent();
-        };
-
-        elements.closePreview.onclick = () => elements.previewModal.classList.add('hidden');
-
-        elements.showCvPreview.onclick = () => {
-            state.activePreview = 'cv';
-            elements.showCvPreview.className = 'px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold';
-            elements.showClPreview.className = 'px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold border border-white/5';
-            updatePreviewContent();
-        };
-
-        elements.showClPreview.onclick = () => {
-            state.activePreview = 'cl';
-            elements.showClPreview.className = 'px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold';
-            elements.showCvPreview.className = 'px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold border border-white/5';
-            updatePreviewContent();
-        };
-
-        function updatePreviewContent() {
-            if (state.activePreview === 'cv') {
-                elements.previewTitle.innerText = 'Optimized CV Preview';
-                elements.previewArea.innerText = state.cvText;
-            } else {
-                elements.previewTitle.innerText = 'Generated Cover Letter Preview';
-                elements.previewArea.innerText = state.clText;
-            }
-        }
-
-        elements.saveChanges.onclick = () => {
-            if (state.activePreview === 'cv') state.cvText = elements.previewArea.innerText;
-            else state.clText = elements.previewArea.innerText;
-            alert('Changes applied to temporary preview. (Note: Full XML rebuild for CV happens only on re-optimization. Manual edits here are saved for the current session.)');
         };
 
         function toggleLoading(isLoading) {
