@@ -220,7 +220,7 @@
 
                 updateProgress(40, 'AI Analysis...');
                 const genAI = new GoogleGenerativeAI(key);
-                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
 
                 const systemInstruction = `You are an Expert Resume Editor. You will be given a raw text resume and a job description.
 Step 1: Identify the following sections in the original text: Professional Summary, Skills, and Experience Bullet Points.
@@ -236,8 +236,15 @@ JSON Format:
 
                 const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
                 const responseText = result.response.text();
+                console.log("AI Response Raw:", responseText);
+
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                const { replacements } = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
+                if (!jsonMatch) throw new Error("AI did not return valid JSON. Check console.");
+                
+                const data = JSON.parse(jsonMatch[0]);
+                const replacements = data.replacements || data.replacementsData || [];
+                
+                if (replacements.length === 0) throw new Error("No replacements identified by AI.");
 
                 updateProgress(75, 'Smart Swapping...');
                 const zip = new PizZip(arrayBuffer);
