@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -239,10 +240,36 @@
 
                 <!-- Step 3: Action -->
                 <div class="glass-card p-8">
-                    <button id="optimizeBtn" class="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl text-lg flex items-center justify-center gap-3">
-                        <span id="btnText">Optimize Resume</span>
-                        <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </button>
+                    <div id="actionPrimary">
+                        <button id="optimizeBtn" class="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl text-lg flex items-center justify-center gap-3">
+                            <span id="btnText">Optimize Everything</span>
+                            <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                    </div>
+
+                    <div id="actionSuccess" class="hidden space-y-6">
+                        <div class="flex items-center gap-3 text-green-400 font-medium justify-center mb-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Optimization Complete
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <button id="downloadCvBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
+                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Download CV
+                            </button>
+                            <button id="downloadClBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
+                                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                Download Cover Letter
+                            </button>
+                        </div>
+                        <button id="previewBtn" class="w-full bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                            Preview & Proofread
+                        </button>
+                        <button onclick="location.reload()" class="w-full text-slate-500 hover:text-slate-400 text-sm font-medium">
+                            Start New Optimization
+                        </button>
+                    </div>
 
                     <div id="progressContainer" class="hidden mt-8">
                         <div class="flex justify-between mb-3 text-sm">
@@ -257,9 +284,35 @@
             </div>
         </div>
 
-        <footer class="mt-20 text-center text-slate-500 text-sm pb-12">
-            <p>© 2026 The Invisible Resume Editor. Precision document manipulation with Gemini 2.5 Flash.</p>
         </footer>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden z-50 flex flex-col p-4 md:p-8">
+        <div class="max-w-4xl mx-auto w-full flex flex-col h-full">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex gap-4">
+                    <button id="showCvPreview" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">CV Preview</button>
+                    <button id="showClPreview" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold border border-white/5 hover:border-white/20 transition-all">Cover Letter Preview</button>
+                </div>
+                <button id="closePreview" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-1 glass-card overflow-hidden flex flex-col p-8 border-white/10 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-slate-200" id="previewTitle">Optimized CV Text</h3>
+                    <span class="text-xs text-slate-500 bg-white/5 px-2 py-1 rounded">Content Editable</span>
+                </div>
+                <div id="previewArea" contenteditable="true" class="flex-1 overflow-y-auto text-slate-300 leading-relaxed font-light focus:outline-none pr-4 scroll-smooth">
+                    <!-- Dynamic Content -->
+                </div>
+                <div class="mt-6 pt-6 border-t border-white/5 flex justify-between items-center">
+                    <p class="text-xs text-slate-500 max-w-md">Edit text directly to fix typos. Note: Formatting changes here only affect the downloaded text content.</p>
+                    <button id="saveChanges" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold transition-all">Apply to Downloads</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Logic -->
@@ -279,10 +332,32 @@
             progressText: document.getElementById('progressText'),
             progressPercent: document.getElementById('progressPercent'),
             progressBar: document.getElementById('progressBar'),
-            apiKeyStatus: document.getElementById('apiKeyStatus')
+            apiKeyStatus: document.getElementById('apiKeyStatus'),
+            actionPrimary: document.getElementById('actionPrimary'),
+            actionSuccess: document.getElementById('actionSuccess'),
+            downloadCvBtn: document.getElementById('downloadCvBtn'),
+            downloadClBtn: document.getElementById('downloadClBtn'),
+            previewBtn: document.getElementById('previewBtn'),
+            previewModal: document.getElementById('previewModal'),
+            closePreview: document.getElementById('closePreview'),
+            previewArea: document.getElementById('previewArea'),
+            previewTitle: document.getElementById('previewTitle'),
+            showCvPreview: document.getElementById('showCvPreview'),
+            showClPreview: document.getElementById('showClPreview'),
+            saveChanges: document.getElementById('saveChanges')
         };
 
-        let selectedFile = null;
+        let state = {
+            selectedFile: null,
+            cvBlob: null,
+            clBlob: null,
+            cvText: '',
+            clText: '',
+            userName: '',
+            targetTitle: '',
+            companyName: '',
+            activePreview: 'cv' // 'cv' or 'cl'
+        };
 
         // Persistence
         const savedKey = localStorage.getItem('gemini_api_key');
@@ -313,7 +388,7 @@
 
         function handleFile(file) {
             if (file?.name.endsWith('.docx')) {
-                selectedFile = file;
+                state.selectedFile = file;
                 elements.fileName.innerText = file.name;
                 elements.fileName.className = 'text-blue-400 font-semibold text-center text-sm';
             } else if (file) {
@@ -328,50 +403,53 @@
             elements.progressBar.style.width = `${percent}%`;
         }
 
+        // --- Optimization Logic ---
         elements.optimizeBtn.onclick = async () => {
             const key = elements.apiKey.value.trim();
             const jd = elements.jdInput.value.trim();
-            if (!key || !selectedFile || !jd) return alert('Key, File, and JD are required.');
+            if (!key || !state.selectedFile || !jd) return alert('Key, File, and JD are required.');
 
             try {
                 toggleLoading(true);
                 updateProgress(10, 'Extracting document text...');
-                const arrayBuffer = await selectedFile.arrayBuffer();
+                const arrayBuffer = await state.selectedFile.arrayBuffer();
                 const { value: resumeText } = await window.mammoth.extractRawText({ arrayBuffer });
 
-                updateProgress(40, 'AI analyzing & rewriting content...');
+                updateProgress(35, 'AI drafting targeted CV and Cover Letter...');
                 const genAI = new GoogleGenerativeAI(key);
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-                const systemInstruction = `You are an Expert Resume Editor. You will be given a raw text resume and a job description.
-Step 1: Identify the Header/Professional Title, Professional Summary, Skills, and Experience Bullet Points.
-Step 2: Rewrite these sections to perfectly align with the job description. Maintain the user's specific years of experience and expertise.
-Step 3: Extract the user's name from the resume and determine a short, professional title for the target job.
-Step 4: Return a JSON object with the following structure:
+                const systemInstruction = `You are an Expert Resume & Career Coach. You will be given a raw text resume and a job description.
+Step 1: Rewrite the Professional Title, Summary, Skills, and Experience to match the job.
+Step 2: Compose a highly professional, 3-paragraph Cover Letter.
+Step 3: Extract the user's name and determine the target job title and company name.
+
+Return ONLY a JSON object with this structure:
 {
-  "userName": "Extracted Name",
-  "targetTitle": "Target Job Title",
-  "replacements": [
-    { "find": "Original title or sentence...", "replace": "New targeted title or sentence..." },
-    { "find": "Original bullet point...", "replace": "New targeted bullet point..." }
-  ]
+  "userName": "Name",
+  "targetTitle": "Title",
+  "companyName": "Company",
+  "cvReplacements": [{ "find": "...", "replace": "..." }],
+  "coverLetter": "Full multi-paragraph text..."
 }
 
 CRITICAL: 
-- Break down long summaries into individual sentences or paragraphs.
-- Each "find" string must correspond to a single continuous block of text found in the original resume.
-- Ensure the "find" string matches the original text EXACTLY.`;
+- "cvReplacements" must match EXACT paragraph blocks from the resume.
+- Maintain the user's facts but pivot the language toward the JD.`;
 
                 const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
                 const responseText = result.response.text();
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
                 const aiData = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
-                const { replacements, userName, targetTitle } = aiData;
+                
+                state.userName = aiData.userName;
+                state.targetTitle = aiData.targetTitle;
+                state.companyName = aiData.companyName;
+                state.clText = aiData.coverLetter;
 
-                updateProgress(75, 'Applying smart XML swaps...');
+                updateProgress(70, 'Performing Smart Swaps in CV XML...');
                 const zip = new window.PizZip(arrayBuffer);
                 let xml = zip.file("word/document.xml").asText();
-                
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xml, "application/xml");
                 const paragraphs = xmlDoc.getElementsByTagName('w:p');
@@ -385,47 +463,119 @@ CRITICAL:
                     let paraText = Array.from(textNodes).map(t => t.textContent).join('');
                     const originalPara = paraText;
 
-                    for (let r of replacements) {
+                    for (let r of aiData.cvReplacements) {
                         const cleanFind = clean(r.find);
                         const cleanPara = clean(paraText);
-                        
                         if (cleanPara.includes(cleanFind)) {
-                            if (paraText.includes(r.find)) {
-                                paraText = paraText.replace(r.find, r.replace);
-                            } else if (cleanPara === cleanFind) {
-                                paraText = r.replace;
-                            }
+                            if (paraText.includes(r.find)) paraText = paraText.replace(r.find, r.replace);
+                            else if (cleanPara === cleanFind) paraText = r.replace;
                         }
                     }
 
                     if (paraText !== originalPara) {
                         textNodes[0].textContent = paraText;
-                        for (let i = textNodes.length - 1; i > 0; i--) {
-                            textNodes[i].parentNode.removeChild(textNodes[i]);
-                        }
+                        for (let i = textNodes.length - 1; i > 0; i--) textNodes[i].parentNode.removeChild(textNodes[i]);
                     }
                 }
 
                 zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
-                updateProgress(95, 'Generating optimized document...');
-                const output = zip.generate({ type: "blob" });
+                state.cvBlob = zip.generate({ type: "blob" });
                 
-                const safeName = (userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
-                const safeTitle = (targetTitle || 'Optimized').replace(/[^a-z0-9]/gi, '_');
-                window.saveAs(output, `${safeName}-${safeTitle}.docx`);
-                
-                updateProgress(100, 'Optimization Successful!');
-                setTimeout(() => toggleLoading(false), 2000);
+                // Get updated CV text for preview
+                const { value: optimizedCvText } = await window.mammoth.extractRawText({ arrayBuffer: await state.cvBlob.arrayBuffer() });
+                state.cvText = optimizedCvText;
+
+                updateProgress(90, 'Generating Cover Letter document...');
+                state.clBlob = await generateCoverLetterDoc(state.clText, state.userName);
+
+                updateProgress(100, 'All Documents Ready!');
+                setTimeout(() => {
+                    elements.actionPrimary.classList.add('hidden');
+                    elements.actionSuccess.classList.remove('hidden');
+                    elements.progressContainer.classList.add('hidden');
+                    toggleLoading(false);
+                }, 1000);
+
             } catch (err) {
                 alert(`Error: ${err.message}`);
                 toggleLoading(false);
             }
         };
 
+        // --- Document Generation ---
+        async function generateCoverLetterDoc(text, name) {
+            const { Document, Packer, Paragraph, TextRun, HeadingLevel } = window.docx;
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({ text: name, heading: HeadingLevel.HEADING_1 }),
+                        new Paragraph({ text: new Date().toLocaleDateString(), spacing: { before: 200, after: 400 } }),
+                        ...text.split('\n').map(line => new Paragraph({
+                            children: [new TextRun(line)],
+                            spacing: { after: 200 }
+                        }))
+                    ],
+                }],
+            });
+            return await Packer.toBlob(doc);
+        }
+
+        // --- Action Handlers ---
+        elements.downloadCvBtn.onclick = () => {
+            const name = (state.userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
+            const title = (state.targetTitle || 'Optimized').replace(/[^a-z0-9]/gi, '_');
+            window.saveAs(state.cvBlob, `${name}-${title}.docx`);
+        };
+
+        elements.downloadClBtn.onclick = () => {
+            const name = (state.userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
+            const company = (state.companyName || 'Company').replace(/[^a-z0-9]/gi, '_');
+            const title = (state.targetTitle || 'Position').replace(/[^a-z0-9]/gi, '_');
+            window.saveAs(state.clBlob, `${name}-${company}-${title}.docx`);
+        };
+
+        // --- Preview Logic ---
+        elements.previewBtn.onclick = () => {
+            elements.previewModal.classList.remove('hidden');
+            updatePreviewContent();
+        };
+
+        elements.closePreview.onclick = () => elements.previewModal.classList.add('hidden');
+
+        elements.showCvPreview.onclick = () => {
+            state.activePreview = 'cv';
+            elements.showCvPreview.className = 'px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold';
+            elements.showClPreview.className = 'px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold border border-white/5';
+            updatePreviewContent();
+        };
+
+        elements.showClPreview.onclick = () => {
+            state.activePreview = 'cl';
+            elements.showClPreview.className = 'px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold';
+            elements.showCvPreview.className = 'px-4 py-2 rounded-lg bg-slate-800 text-slate-400 text-sm font-semibold border border-white/5';
+            updatePreviewContent();
+        };
+
+        function updatePreviewContent() {
+            if (state.activePreview === 'cv') {
+                elements.previewTitle.innerText = 'Optimized CV Preview';
+                elements.previewArea.innerText = state.cvText;
+            } else {
+                elements.previewTitle.innerText = 'Generated Cover Letter Preview';
+                elements.previewArea.innerText = state.clText;
+            }
+        }
+
+        elements.saveChanges.onclick = () => {
+            if (state.activePreview === 'cv') state.cvText = elements.previewArea.innerText;
+            else state.clText = elements.previewArea.innerText;
+            alert('Changes applied to temporary preview. (Note: Full XML rebuild for CV happens only on re-optimization. Manual edits here are saved for the current session.)');
+        };
+
         function toggleLoading(isLoading) {
             elements.optimizeBtn.disabled = isLoading;
-            elements.btnText.innerText = isLoading ? 'Processing...' : 'Optimize Resume';
-            if (!isLoading) elements.progressContainer.classList.add('hidden');
+            elements.btnText.innerText = isLoading ? 'Processing...' : 'Optimize Everything';
         }
     </script>
 </body>

@@ -1,36 +1,42 @@
 # The Invisible Resume Editor
 
-The Invisible Resume Editor is a tool that allows anyone to optimize their professional resume for specific job roles. By using artificial intelligence, the application tailors your existing content to match job requirements while preserving the original formatting and style of your Microsoft Word document.
+The Invisible Resume Editor is a comprehensive career tool that allows users to optimize their resumes and generate tailored cover letters for specific job roles. By leveraging advanced artificial intelligence, the application adapts your professional content to match job requirements while ensuring your original document formatting remains intact.
 
 ## Quick Start Guide
 
-Follow these simple steps to optimize your resume in minutes:
+1. Obtain a Gemini API key from the Google AI Studio website.
+2. Enter your API key in the configuration section of the application.
+3. Upload your resume in .docx format by dragging it into the designated upload area.
+4. Paste the job description or target role details into the text field.
+5. Click the optimization button to process your documents.
+6. Use the Preview and Proofread feature to verify the content.
+7. Download your optimized CV and custom Cover Letter using the dedicated buttons.
 
-1. Obtain a free Gemini API key from the Google AI Studio website.
-2. Enter your API key in the configuration field at the top of the page.
-3. Upload your current resume in .docx format by dragging it into the upload box.
-4. Paste the job description you are applying for into the text area.
-5. Click the optimization button and wait for your new resume to download.
+## Core Features
 
-## Key Features
+### Intelligent CV Optimization
+The system analyzes your existing resume alongside the job description to identify key technical skills and experiences. It rewrites summaries and bullet points to maximize relevance while preserving your professional history and formatting.
 
-### Intelligent Content Matching
-The system uses the Gemini 1.5 Flash model to analyze your resume and the job description. It identifies the most relevant sections and rewrites them to highlight the skills and experiences that matter most to recruiters.
+### Custom Cover Letter Generation
+In addition to CV optimization, the tool drafts a professional, three paragraph cover letter tailored to the specific position and company. This document is generated from scratch as a new Word file.
 
-### Layout Preservation
-Unlike other tools that destroy your document styling, this editor works directly with the internal structure of your Word file. It ensures that your fonts, margins, and design remain exactly as you intended.
+### Live Preview and Proofreading
+A built in editor allows you to review and modify the generated text before downloading. This ensures you can fix typos or adjust the tone of the AI generated content directly within the browser.
+
+### Professional Naming Conventions
+Output files are automatically renamed using a standard professional format. Resumes are saved as Name-Position.docx, and cover letters are saved as Name-Company-Position.docx.
 
 ### Private and Secure
-Privacy is a priority for this project. The application runs entirely in your web browser. Your resume data and API keys are never stored on an external server and remain under your control at all times.
+The application operates entirely within your web browser. No resume data or API keys are sent to any external server except for the official Google API endpoint. Your sensitive professional information remains private.
 
-## Technical Information
+## Technical Details
 
-This application is built with modern web technologies including Tailwind CSS for the user interface and Mammoth.js for text extraction. It uses PizZip for document manipulation and the Google Generative AI SDK for intelligent processing. No backend server is required, making it suitable for hosting on platforms like GitHub Pages.
+This project is built using Tailwind CSS for a modern interface and several specialized libraries including Mammoth.js for extraction, PizZip for XML manipulation, and docx.js for document creation. It is a client side application fully compatible with GitHub Pages.
 
-## Usage Notes
+## Important Note
 
-This tool is designed to assist in the resume writing process. It is recommended that you review all AI generated content for accuracy and personal tone before submission.
+This tool is designed to assist in the professional application process. You must review all generated content for accuracy and truthfulness before submitting your application to potential employers.
 
 ## License
 
-This software is provided for professional development and personal use. Users are responsible for the final content of their resumes.
+This software is provided for personal professional development. Users retain full responsibility for the final content and accuracy of their application materials.
