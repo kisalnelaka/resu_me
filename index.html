@@ -380,7 +380,7 @@
 
                 const systemInstruction = `You are an Expert Resume & Career Coach specializing in Applicant Tracking Systems (ATS). You will be given a raw text resume and a job description.
 Step 1: Rewrite the Professional Title, Summary, Skills, and Experience to match the job.
-Step 2: Compose a highly professional, 3-paragraph Cover Letter.
+Step 2: Compose a properly structured Cover Letter. Include a professional Salutation (e.g., "Dear Hiring Manager,"), a compelling Introduction, a specific Body Paragraph matching the JD, a professional Closing Paragraph, and a formal Letter Ending with your name (e.g., "Sincerely, [Name]").
 Step 3: Extract the user's name and determine the target job title and company name.
 
 ATS OPTIMIZATION RULES:
@@ -488,7 +488,7 @@ CRITICAL:
             const finalXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
             <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
                 <w:body>
-                    <w:p><w:r><w:rPr><w:b/></w:rPr><w:t>${cleanName}</w:t></w:r></w:p>
+                    <w:p><w:r><w:rPr><w:b/><w:sz w:val="28"/></w:rPr><w:t>${cleanName}</w:t></w:r></w:p>
                     <w:p><w:r><w:t>${new Date().toLocaleDateString()}</w:t></w:r></w:p>
                     <w:p/>
                     ${xmlParagraphs}
