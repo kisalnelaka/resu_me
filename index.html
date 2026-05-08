@@ -1,166 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invisible Resume Editor | Zero-Touch Optimization</title>
+    <title>Invisible Resume Editor | Premium AI Optimization</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --bg: #030712;
+            --card: rgba(17, 24, 39, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
             --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.5);
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --secondary: #8b5cf6;
         }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: #0a0a0c;
-            color: #e2e8f0;
-            background-image:
-                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
+            background-color: var(--bg);
+            color: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 35%),
+                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 35%);
+            background-attachment: fixed;
             min-height: 100vh;
         }
 
-        .glass-panel {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
+        .glass-card {
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
             border-radius: 24px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .accent-text {
-            color: var(--accent);
-            text-shadow: 0 0 20px var(--accent-glow);
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
-        textarea,
-        input {
-            background: rgba(0, 0, 0, 0.3) !important;
-            border: 1px solid var(--glass-border) !important;
-            transition: all 0.2s ease;
+        .accent-gradient {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        textarea:focus,
-        input:focus {
-            border-color: var(--accent) !important;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--secondary));
+            box-shadow: 0 0 20px var(--accent-glow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--accent-glow);
+            filter: brightness(1.1);
+        }
+
+        .input-glow {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .input-glow:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
             outline: none;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
             box-shadow: 0 0 10px var(--accent-glow);
+            transition: width 0.5s ease;
         }
 
-        .progress-fill {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #dropzone.dragover {
+        #dropzone.active {
             border-color: var(--accent);
             background: rgba(59, 130, 246, 0.05);
+            transform: scale(1.01);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s infinite ease-in-out;
         }
     </style>
 </head>
-
-<body class="p-4 md:p-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Header -->
-        <header class="mb-12 text-center">
-            <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
-                The <span class="accent-text">Invisible</span> Resume Editor
+<body class="py-12 px-4 md:px-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header Section -->
+        <header class="text-center mb-16">
+            <div class="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-4 animate-pulse-subtle">
+                AI-Powered Professional Optimizer
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                The <span class="accent-gradient">Invisible</span> Editor
             </h1>
-            <p class="text-slate-400 text-lg font-light">Zero-touch optimization for high-end full-stack roles.</p>
+            <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+                Zero-touch resume optimization that preserves your formatting perfectly.
+                Optimized for high-impact roles and ATS performance.
+            </p>
         </header>
 
-        <!-- Main Interface -->
-        <div class="grid gap-8">
-            <!-- Configuration -->
-            <div class="glass-panel p-6">
-                <div class="flex items-center gap-4 mb-4">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">1
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Left Column: Guide & FAQ -->
+            <div class="lg:col-span-4 space-y-8">
+                <!-- How to Use -->
+                <section class="glass-card p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Getting Started
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">1</div>
+                            <div>
+                                <p class="font-medium mb-1">Get an API Key</p>
+                                <p class="text-sm text-slate-400 leading-snug">Visit <a href="https://aistudio.google.com/" target="_blank" class="text-blue-400 hover:underline">Google AI Studio</a> to get your free Gemini API key.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">2</div>
+                            <div>
+                                <p class="font-medium mb-1">Upload .docx</p>
+                                <p class="text-sm text-slate-400 leading-snug">Upload your existing Word resume. PDF is not supported for formatting preservation.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">3</div>
+                            <div>
+                                <p class="font-medium mb-1">Paste Job Link/JD</p>
+                                <p class="text-sm text-slate-400 leading-snug">Copy and paste the full job description into the field.</p>
+                            </div>
+                        </div>
                     </div>
-                    <h2 class="text-xl font-semibold">Gemini API Configuration</h2>
-                </div>
-                <div class="relative">
-                    <input type="password" id="apiKey" placeholder="Paste your Google AI Studio API Key..."
-                        class="w-full p-4 rounded-xl text-white placeholder:text-slate-600">
-                    <div id="apiKeyStatus" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
-                        Saved in localStorage
+                </section>
+
+                <!-- FAQ -->
+                <section class="glass-card p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        FAQ
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="faq-item pb-4">
+                            <p class="font-medium text-sm text-slate-200 mb-1">Is it safe?</p>
+                            <p class="text-xs text-slate-400">Yes. Processing happens in your browser. Your API key and CV are never stored on any server.</p>
+                        </div>
+                        <div class="faq-item pb-4">
+                            <p class="font-medium text-sm text-slate-200 mb-1">Will it mess up my fonts?</p>
+                            <p class="text-xs text-slate-400">No. The "Smart Swap" technology updates text nodes directly within the XML, keeping all styles intact.</p>
+                        </div>
+                        <div class="faq-item pb-4">
+                            <p class="font-medium text-sm text-slate-200 mb-1">Does it support other languages?</p>
+                            <p class="text-xs text-slate-400">It works best with English, but since Gemini is multilingual, it supports 100+ languages including Arabic, French, and Spanish.</p>
+                        </div>
                     </div>
-                </div>
-                <p class="mt-2 text-xs text-slate-500 px-1">Your key is only used in your browser and never shared.</p>
+                </section>
             </div>
 
-            <!-- Upload & JD -->
-            <div class="grid md:grid-cols-2 gap-8">
-                <!-- Dropzone -->
-                <div class="glass-panel p-6 flex flex-col">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div
-                            class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">
-                            2</div>
-                        <h2 class="text-xl font-semibold">Upload Resume</h2>
+            <!-- Right Column: Main App -->
+            <div class="lg:col-span-8 space-y-8">
+                <!-- Step 1: API Key -->
+                <div class="glass-card p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-semibold flex items-center gap-3">
+                            <span class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">1</span>
+                            Configuration
+                        </h2>
+                        <span id="apiKeyStatus" class="text-xs text-slate-500">Not Configured</span>
                     </div>
-                    <div id="dropzone"
-                        class="flex-1 border-2 border-dashed border-slate-700 rounded-2xl flex flex-col items-center justify-center p-8 cursor-pointer hover:border-slate-500 transition-colors">
-                        <svg class="w-12 h-12 text-slate-500 mb-4" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                        <p id="fileName" class="text-slate-400 text-center text-sm">Drag & drop your .docx resume here
-                            or click to browse</p>
-                        <input type="file" id="fileInput" accept=".docx" class="hidden">
+                    <input type="password" id="apiKey" placeholder="Enter your Gemini API Key..." 
+                           class="w-full p-4 rounded-xl input-glow text-white font-mono text-sm">
+                </div>
+
+                <!-- Step 2: Files & JD -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Dropzone -->
+                    <div class="glass-card p-8 flex flex-col">
+                        <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
+                            <span class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">2</span>
+                            Upload CV
+                        </h2>
+                        <div id="dropzone" class="flex-1 border-2 border-dashed border-slate-700 rounded-2xl flex flex-col items-center justify-center p-8 cursor-pointer transition-all hover:border-blue-500/50 hover:bg-blue-500/5">
+                            <svg class="w-12 h-12 text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <p id="fileName" class="text-slate-400 text-center text-sm">Drop .docx here or browse</p>
+                            <input type="file" id="fileInput" accept=".docx" class="hidden">
+                        </div>
+                    </div>
+
+                    <!-- JD -->
+                    <div class="glass-card p-8">
+                        <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
+                            <span class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">3</span>
+                            Job Goals
+                        </h2>
+                        <textarea id="jdInput" placeholder="Paste the job description or target role details..." 
+                                  class="w-full h-40 p-4 rounded-2xl input-glow text-white text-sm resize-none"></textarea>
                     </div>
                 </div>
 
-                <!-- Job Description -->
-                <div class="glass-panel p-6">
-                    <div class="flex items-center gap-4 mb-4">
-                        <div
-                            class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">
-                            3</div>
-                        <h2 class="text-xl font-semibold">Job Description</h2>
-                    </div>
-                    <textarea id="jdInput" placeholder="Paste the target job description here..."
-                        class="w-full h-48 p-4 rounded-xl text-white placeholder:text-slate-600 resize-none"></textarea>
-                </div>
-            </div>
+                <!-- Step 3: Action -->
+                <div class="glass-card p-8">
+                    <button id="optimizeBtn" class="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl text-lg flex items-center justify-center gap-3">
+                        <span id="btnText">Optimize Resume</span>
+                        <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
 
-            <!-- Action Button & Progress -->
-            <div class="glass-panel p-8">
-                <button id="optimizeBtn"
-                    class="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 text-lg mb-6 shadow-lg shadow-blue-900/20">
-                    <span id="btnText">Optimize My Resume</span>
-                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </button>
-
-                <div id="progressContainer" class="hidden">
-                    <div class="flex justify-between mb-2 text-sm">
-                        <span id="progressText" class="text-slate-400">Initializing...</span>
-                        <span id="progressPercent" class="text-blue-500 font-mono">0%</span>
-                    </div>
-                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div id="progressBar" class="progress-fill h-full bg-blue-600 w-0"></div>
+                    <div id="progressContainer" class="hidden mt-8">
+                        <div class="flex justify-between mb-3 text-sm">
+                            <span id="progressText" class="text-slate-400 font-medium italic">Processing...</span>
+                            <span id="progressPercent" class="text-blue-400 font-bold">0%</span>
+                        </div>
+                        <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-white/5">
+                            <div id="progressBar" class="progress-bar h-full w-0"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-12 text-center text-slate-600 text-sm">
-            <p>© 2026 The Invisible Resume Editor. Built for Everyone.</p>
+        <footer class="mt-20 text-center text-slate-500 text-sm pb-12">
+            <p>© 2026 The Invisible Resume Editor. Precision document manipulation with Gemini 2.5 Flash.</p>
         </footer>
     </div>
 
-    <!-- Scripts -->
+    <!-- Logic -->
     <script type="module">
         import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
@@ -176,27 +271,46 @@
             progressContainer: document.getElementById('progressContainer'),
             progressText: document.getElementById('progressText'),
             progressPercent: document.getElementById('progressPercent'),
-            progressBar: document.getElementById('progressBar')
+            progressBar: document.getElementById('progressBar'),
+            apiKeyStatus: document.getElementById('apiKeyStatus')
         };
 
         let selectedFile = null;
 
         // Persistence
-        elements.apiKey.value = localStorage.getItem('gemini_api_key') || '';
-        elements.apiKey.oninput = (e) => localStorage.setItem('gemini_api_key', e.target.value);
+        const savedKey = localStorage.getItem('gemini_api_key');
+        if (savedKey) {
+            elements.apiKey.value = savedKey;
+            elements.apiKeyStatus.innerText = 'Key Loaded';
+            elements.apiKeyStatus.className = 'text-xs text-green-500 font-medium';
+        }
+
+        elements.apiKey.oninput = (e) => {
+            const val = e.target.value.trim();
+            localStorage.setItem('gemini_api_key', val);
+            elements.apiKeyStatus.innerText = val ? 'Key Saved' : 'Not Configured';
+            elements.apiKeyStatus.className = val ? 'text-xs text-green-500 font-medium' : 'text-xs text-slate-500';
+        };
 
         // UI Interactions
         elements.dropzone.onclick = () => elements.fileInput.click();
         elements.fileInput.onchange = (e) => handleFile(e.target.files[0]);
-        elements.dropzone.ondragover = (e) => { e.preventDefault(); elements.dropzone.classList.add('dragover'); };
-        elements.dropzone.ondragleave = () => elements.dropzone.classList.remove('dragover');
-        elements.dropzone.ondrop = (e) => { e.preventDefault(); elements.dropzone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); };
+        
+        elements.dropzone.ondragover = (e) => { e.preventDefault(); elements.dropzone.classList.add('active'); };
+        elements.dropzone.ondragleave = () => elements.dropzone.classList.remove('active');
+        elements.dropzone.ondrop = (e) => {
+            e.preventDefault();
+            elements.dropzone.classList.remove('active');
+            handleFile(e.dataTransfer.files[0]);
+        };
 
         function handleFile(file) {
             if (file?.name.endsWith('.docx')) {
                 selectedFile = file;
                 elements.fileName.innerText = file.name;
                 elements.fileName.className = 'text-blue-400 font-semibold text-center text-sm';
+            } else if (file) {
+                alert('Please upload a .docx file for formatting preservation.');
             }
         }
 
@@ -214,17 +328,17 @@
 
             try {
                 toggleLoading(true);
-                updateProgress(10, 'Extracting text...');
+                updateProgress(10, 'Extracting document text...');
                 const arrayBuffer = await selectedFile.arrayBuffer();
                 const { value: resumeText } = await window.mammoth.extractRawText({ arrayBuffer });
 
-                updateProgress(40, 'AI Analysis...');
+                updateProgress(40, 'AI analyzing & rewriting content...');
                 const genAI = new GoogleGenerativeAI(key);
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
                 const systemInstruction = `You are an Expert Resume Editor. You will be given a raw text resume and a job description.
-Step 1: Identify the following sections in the original text: Header/Professional Title, Professional Summary, Skills, and Experience Bullet Points.
-Step 2: Rewrite these sections to perfectly align with the job description. Maintain the user's 8+ years of experience and specific expertise in Laravel, Odoo, and Qatar-market compliance.
+Step 1: Identify the Header/Professional Title, Professional Summary, Skills, and Experience Bullet Points.
+Step 2: Rewrite these sections to perfectly align with the job description. Maintain the user's specific years of experience and expertise.
 Step 3: Return a JSON object where each key is the EXACT text from the original resume and the value is the new, rewritten text. 
 
 CRITICAL: 
@@ -245,40 +359,32 @@ JSON Format:
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
                 const { replacements } = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
 
-                updateProgress(75, 'Smart Swapping...');
+                updateProgress(75, 'Applying smart XML swaps...');
                 const zip = new window.PizZip(arrayBuffer);
                 let xml = zip.file("word/document.xml").asText();
-
-                // Optimized XML Search/Replace
+                
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xml, "application/xml");
                 const paragraphs = xmlDoc.getElementsByTagName('w:p');
+
+                const clean = (str) => str.replace(/\s+/g, ' ').trim();
 
                 for (let p of paragraphs) {
                     const textNodes = p.getElementsByTagName('w:t');
                     if (textNodes.length === 0) continue;
 
-                    const clean = (str) => str.replace(/\s+/g, ' ').trim();
                     let paraText = Array.from(textNodes).map(t => t.textContent).join('');
-                    let originalPara = paraText;
+                    const originalPara = paraText;
 
                     for (let r of replacements) {
                         const cleanFind = clean(r.find);
                         const cleanPara = clean(paraText);
                         
                         if (cleanPara.includes(cleanFind)) {
-                            // If it's a near-exact match but with whitespace diffs, 
-                            // we need to find where it is in the original text.
-                            // For simplicity, if the cleaned versions match well, 
-                            // we replace the whole paragraph if the find string is the bulk of it,
-                            // or we try to find the original substring.
                             if (paraText.includes(r.find)) {
                                 paraText = paraText.replace(r.find, r.replace);
-                            } else {
-                                // Fallback: if cleaned versions match exactly, replace the whole thing
-                                if (cleanPara === cleanFind) {
-                                    paraText = r.replace;
-                                }
+                            } else if (cleanPara === cleanFind) {
+                                paraText = r.replace;
                             }
                         }
                     }
@@ -292,23 +398,23 @@ JSON Format:
                 }
 
                 zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
-                updateProgress(95, 'Finalizing...');
+                updateProgress(95, 'Generating optimized document...');
                 const output = zip.generate({ type: "blob" });
                 window.saveAs(output, selectedFile.name.replace('.docx', '_Optimized.docx'));
-                updateProgress(100, 'Done!');
+                
+                updateProgress(100, 'Optimization Successful!');
                 setTimeout(() => toggleLoading(false), 2000);
             } catch (err) {
-                alert(err.message);
+                alert(`Error: ${err.message}`);
                 toggleLoading(false);
             }
         };
 
         function toggleLoading(isLoading) {
             elements.optimizeBtn.disabled = isLoading;
-            elements.btnText.innerText = isLoading ? 'Processing...' : 'Optimize My Resume';
+            elements.btnText.innerText = isLoading ? 'Processing...' : 'Optimize Resume';
             if (!isLoading) elements.progressContainer.classList.add('hidden');
         }
     </script>
 </body>
-
 </html>
