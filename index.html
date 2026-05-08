@@ -7,7 +7,7 @@
     <title>Invisible Resume Editor | Zero-Touch Optimization</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.1/pizzip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
         rel="stylesheet">
@@ -220,7 +220,7 @@
 
                 updateProgress(40, 'AI Analysis...');
                 const genAI = new GoogleGenerativeAI(key);
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
                 const systemInstruction = `You are an Expert Resume Editor. You will be given a raw text resume and a job description.
 Step 1: Identify the following sections in the original text: Professional Summary, Skills, and Experience Bullet Points.
@@ -236,18 +236,11 @@ JSON Format:
 
                 const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
                 const responseText = result.response.text();
-                console.log("AI Response Raw:", responseText);
-
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                if (!jsonMatch) throw new Error("AI did not return valid JSON. Check console.");
-                
-                const data = JSON.parse(jsonMatch[0]);
-                const replacements = data.replacements || data.replacementsData || [];
-                
-                if (replacements.length === 0) throw new Error("No replacements identified by AI.");
+                const { replacements } = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
 
                 updateProgress(75, 'Smart Swapping...');
-                const zip = new PizZip(arrayBuffer);
+                const zip = new window.PizZip(arrayBuffer);
                 let xml = zip.file("word/document.xml").asText();
 
                 // Optimized XML Search/Replace
