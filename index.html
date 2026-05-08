@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invisible Resume Editor | Zero-Touch Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.1/pizzip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0a0a0c;
+            color: #e2e8f0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+        }
+        .accent-text {
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+        textarea, input {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid var(--glass-border) !important;
+            transition: all 0.2s ease;
+        }
+        textarea:focus, input:focus {
+            border-color: var(--accent) !important;
+            outline: none;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .progress-fill {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #dropzone.dragover {
+            border-color: var(--accent);
+            background: rgba(59, 130, 246, 0.05);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight">
+                The <span class="accent-text">Invisible</span> Resume Editor
+            </h1>
+            <p class="text-slate-400 text-lg font-light">Zero-touch optimization for high-end full-stack roles.</p>
+        </header>
+
+        <!-- Main Interface -->
+        <div class="grid gap-8">
+            <!-- Configuration -->
+            <div class="glass-panel p-6">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">1</div>
+                    <h2 class="text-xl font-semibold">Gemini API Configuration</h2>
+                </div>
+                <div class="relative">
+                    <input type="password" id="apiKey" placeholder="Paste your Google AI Studio API Key..." 
+                           class="w-full p-4 rounded-xl text-white placeholder:text-slate-600">
+                    <div id="apiKeyStatus" class="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-slate-500">
+                        Saved in localStorage
+                    </div>
+                </div>
+                <p class="mt-2 text-xs text-slate-500 px-1">Your key is only used in your browser and never shared.</p>
+            </div>
+
+            <!-- Upload & JD -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Dropzone -->
+                <div class="glass-panel p-6 flex flex-col">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">2</div>
+                        <h2 class="text-xl font-semibold">Upload Resume</h2>
+                    </div>
+                    <div id="dropzone" class="flex-1 border-2 border-dashed border-slate-700 rounded-2xl flex flex-col items-center justify-center p-8 cursor-pointer hover:border-slate-500 transition-colors">
+                        <svg class="w-12 h-12 text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p id="fileName" class="text-slate-400 text-center text-sm">Drag & drop your .docx resume here or click to browse</p>
+                        <input type="file" id="fileInput" accept=".docx" class="hidden">
+                    </div>
+                </div>
+
+                <!-- Job Description -->
+                <div class="glass-panel p-6">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold">3</div>
+                        <h2 class="text-xl font-semibold">Job Description</h2>
+                    </div>
+                    <textarea id="jdInput" placeholder="Paste the target job description here..." 
+                              class="w-full h-48 p-4 rounded-xl text-white placeholder:text-slate-600 resize-none"></textarea>
+                </div>
+            </div>
+
+            <!-- Action Button & Progress -->
+            <div class="glass-panel p-8">
+                <button id="optimizeBtn" class="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-3 text-lg mb-6 shadow-lg shadow-blue-900/20">
+                    <span id="btnText">Optimize My Resume</span>
+                    <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </button>
+
+                <div id="progressContainer" class="hidden">
+                    <div class="flex justify-between mb-2 text-sm">
+                        <span id="progressText" class="text-slate-400">Initializing...</span>
+                        <span id="progressPercent" class="text-blue-500 font-mono">0%</span>
+                    </div>
+                    <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="progressBar" class="progress-fill h-full bg-blue-600 w-0"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-slate-600 text-sm">
+            <p>© 2026 The Invisible Resume Editor. Built for Senior Full-Stack Engineers.</p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
+
+        const elements = {
+            apiKey: document.getElementById('apiKey'),
+            dropzone: document.getElementById('dropzone'),
+            fileInput: document.getElementById('fileInput'),
+            fileName: document.getElementById('fileName'),
+            jdInput: document.getElementById('jdInput'),
+            optimizeBtn: document.getElementById('optimizeBtn'),
+            btnText: document.getElementById('btnText'),
+            btnIcon: document.getElementById('btnIcon'),
+            progressContainer: document.getElementById('progressContainer'),
+            progressText: document.getElementById('progressText'),
+            progressPercent: document.getElementById('progressPercent'),
+            progressBar: document.getElementById('progressBar')
+        };
+
+        let selectedFile = null;
+
+        // Persistence
+        elements.apiKey.value = localStorage.getItem('gemini_api_key') || '';
+        elements.apiKey.oninput = (e) => localStorage.setItem('gemini_api_key', e.target.value);
+
+        // UI Interactions
+        elements.dropzone.onclick = () => elements.fileInput.click();
+        elements.fileInput.onchange = (e) => handleFile(e.target.files[0]);
+        elements.dropzone.ondragover = (e) => { e.preventDefault(); elements.dropzone.classList.add('dragover'); };
+        elements.dropzone.ondragleave = () => elements.dropzone.classList.remove('dragover');
+        elements.dropzone.ondrop = (e) => { e.preventDefault(); elements.dropzone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); };
+
+        function handleFile(file) {
+            if (file?.name.endsWith('.docx')) {
+                selectedFile = file;
+                elements.fileName.innerText = file.name;
+                elements.fileName.className = 'text-blue-400 font-semibold text-center text-sm';
+            }
+        }
+
+        function updateProgress(percent, text) {
+            elements.progressContainer.classList.remove('hidden');
+            elements.progressText.innerText = text;
+            elements.progressPercent.innerText = `${percent}%`;
+            elements.progressBar.style.width = `${percent}%`;
+        }
+
+        elements.optimizeBtn.onclick = async () => {
+            const key = elements.apiKey.value.trim();
+            const jd = elements.jdInput.value.trim();
+            if (!key || !selectedFile || !jd) return alert('Key, File, and JD are required.');
+
+            try {
+                toggleLoading(true);
+                updateProgress(10, 'Extracting text...');
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const { value: resumeText } = await mammoth.extractRawText({ arrayBuffer });
+
+                updateProgress(40, 'AI Analysis...');
+                const genAI = new GoogleGenerativeAI(key);
+                const model = genAI.getGenerativeModel({ 
+                    model: "gemini-1.5-flash",
+                    systemInstruction: `You are an Expert Resume Editor. You will be given a raw text resume and a job description.
+Step 1: Identify the following sections in the original text: Professional Summary, Skills, and Experience Bullet Points.
+Step 2: Rewrite these sections to perfectly align with the job description. Maintain the user's 8+ years of experience and specific expertise in Laravel, Odoo, and Qatar-market compliance.
+Step 3: Return a JSON object where each key is the EXACT text from the original resume and the value is the new, rewritten text. 
+JSON Format:
+{
+  "replacements": [
+    { "find": "Original summary sentence...", "replace": "New targeted summary sentence..." },
+    { "find": "Original bullet point...", "replace": "New targeted bullet point..." }
+  ]
+}`
+                });
+
+                const result = await model.generateContent(`RESUME:\n${resumeText}\n\nJD:\n${jd}`);
+                const responseText = result.response.text();
+                const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+                const { replacements } = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
+
+                updateProgress(75, 'Smart Swapping...');
+                const zip = new PizZip(arrayBuffer);
+                let xml = zip.file("word/document.xml").asText();
+                
+                // Optimized XML Search/Replace
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xml, "application/xml");
+                const paragraphs = xmlDoc.getElementsByTagName('w:p');
+
+                for (let p of paragraphs) {
+                    const textNodes = p.getElementsByTagName('w:t');
+                    if (textNodes.length === 0) continue;
+
+                    let paraText = Array.from(textNodes).map(t => t.textContent).join('');
+                    let originalPara = paraText;
+
+                    for (let r of replacements) {
+                        if (paraText.includes(r.find)) {
+                            paraText = paraText.replace(r.find, r.replace);
+                        }
+                    }
+
+                    if (paraText !== originalPara) {
+                        textNodes[0].textContent = paraText;
+                        for (let i = textNodes.length - 1; i > 0; i--) {
+                            textNodes[i].parentNode.removeChild(textNodes[i]);
+                        }
+                    }
+                }
+
+                zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
+                updateProgress(95, 'Finalizing...');
+                const output = zip.generate({ type: "blob" });
+                saveAs(output, selectedFile.name.replace('.docx', '_Optimized.docx'));
+                updateProgress(100, 'Done!');
+                setTimeout(() => toggleLoading(false), 2000);
+            } catch (err) {
+                alert(err.message);
+                toggleLoading(false);
+            }
+        };
+
+        function toggleLoading(isLoading) {
+            elements.optimizeBtn.disabled = isLoading;
+            elements.btnText.innerText = isLoading ? 'Processing...' : 'Optimize My Resume';
+            if (!isLoading) elements.progressContainer.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
