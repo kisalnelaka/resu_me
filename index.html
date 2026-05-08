@@ -216,7 +216,7 @@
                 toggleLoading(true);
                 updateProgress(10, 'Extracting text...');
                 const arrayBuffer = await selectedFile.arrayBuffer();
-                const { value: resumeText } = await mammoth.extractRawText({ arrayBuffer });
+                const { value: resumeText } = await window.mammoth.extractRawText({ arrayBuffer });
 
                 updateProgress(40, 'AI Analysis...');
                 const genAI = new GoogleGenerativeAI(key);
@@ -272,7 +272,7 @@ JSON Format:
                 zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
                 updateProgress(95, 'Finalizing...');
                 const output = zip.generate({ type: "blob" });
-                saveAs(output, selectedFile.name.replace('.docx', '_Optimized.docx'));
+                window.saveAs(output, selectedFile.name.replace('.docx', '_Optimized.docx'));
                 updateProgress(100, 'Done!');
                 setTimeout(() => toggleLoading(false), 2000);
             } catch (err) {
