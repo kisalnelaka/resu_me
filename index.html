@@ -180,6 +180,9 @@
                 </button>
             </div>
 
+            <!-- Log Area -->
+            <div id="logArea" class="hidden minimal-card p-4 font-mono text-[10px] text-secondary h-32 overflow-y-auto space-y-1"></div>
+
             <!-- Success State -->
             <div id="successArea" class="hidden space-y-6">
                 <div class="minimal-card p-8 text-center border-green-900/30">
@@ -239,6 +242,7 @@
             progressBar: document.getElementById('progressBar'),
             apiKeyStatus: document.getElementById('apiKeyStatus'),
             actionArea: document.getElementById('actionArea'),
+            logArea: document.getElementById('logArea'),
             successArea: document.getElementById('successArea'),
             downloadCvBtn: document.getElementById('downloadCvBtn'),
             downloadClBtn: document.getElementById('downloadClBtn')
@@ -253,16 +257,34 @@
             companyName: ''
         };
 
+        // Logging Utility
+        function uiLog(msg, type = 'info') {
+            const color = type === 'error' ? 'text-red-500' : (type === 'success' ? 'text-green-500' : 'text-secondary');
+            const time = new Date().toLocaleTimeString();
+            elements.logArea.classList.remove('hidden');
+            elements.logArea.innerHTML += `<div class="${color}">[${time}] ${msg}</div>`;
+            elements.logArea.scrollTop = elements.logArea.scrollHeight;
+            console.log(`[${type}] ${msg}`);
+        }
+
         // Persistence
-        const savedKey = localStorage.getItem('gemini_api_key');
-        if (savedKey) {
-            elements.apiKey.value = savedKey;
-            updateKeyStatus(true);
+        try {
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if (savedKey) {
+                elements.apiKey.value = savedKey;
+                updateKeyStatus(true);
+            }
+        } catch (e) {
+            uiLog('Warning: Could not access localStorage. API key will not be saved.', 'error');
         }
 
         elements.apiKey.oninput = (e) => {
             const val = e.target.value.trim();
-            localStorage.setItem('gemini_api_key', val);
+            try {
+                localStorage.setItem('gemini_api_key', val);
+            } catch (e) {
+                // Ignore localStorage errors
+            }
             updateKeyStatus(!!val);
         };
 
@@ -306,8 +328,10 @@
                 elements.fileSubtext.classList.remove('text-secondary');
                 elements.fileSubtext.classList.add('text-green-500');
                 elements.dropzone.classList.add('file-loaded');
+                document.getElementById('uploadIcon').innerHTML = `<svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>`;
+                uiLog(`Resume uploaded: ${file.name}`, 'success');
             } else if (file) {
-                alert('Only .docx files are supported for formatting preservation.');
+                uiLog('Failed: Only .docx files are supported.', 'error');
                 resetUpload();
             }
         }
@@ -320,6 +344,7 @@
             elements.fileSubtext.classList.add('text-secondary');
             elements.fileSubtext.classList.remove('text-green-500');
             elements.dropzone.classList.remove('file-loaded');
+            document.getElementById('uploadIcon').innerHTML = `<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>`;
             elements.fileInput.value = '';
         }
 
@@ -335,20 +360,29 @@
             const key = elements.apiKey.value.trim();
             const jd = elements.jdInput.value.trim();
 
-            if (!key) return alert('API Key Required.');
-            if (!state.selectedFile) return alert('Please Select a .docx Resume.');
-            if (!jd) return alert('Please Paste Job Description.');
+            if (!key) { uiLog('API Key Required.', 'error'); return; }
+            if (!state.selectedFile) { uiLog('Please Select a .docx Resume.', 'error'); return; }
+            if (!jd) { uiLog('Please Paste Job Description.', 'error'); return; }
 
             try {
+                uiLog('Optimization process started...');
                 toggleLoading(true);
+                
                 updateProgress(10, 'Parsing Structure');
+                uiLog('Extracting text from DOCX using Mammoth...');
+                if (!window.mammoth) throw new Error("Mammoth library failed to load from CDN.");
                 const arrayBuffer = await state.selectedFile.arrayBuffer();
                 const { value: resumeText } = await window.mammoth.extractRawText({ arrayBuffer });
+                uiLog(`Successfully extracted ${resumeText.length} characters of text.`, 'success');
 
                 updateProgress(40, 'AI Synthesis');
+                uiLog('Importing Google Generative AI...');
                 const { GoogleGenerativeAI } = await import("https://esm.run/@google/generative-ai");
+                uiLog('Google Generative AI initialized.');
                 const genAI = new GoogleGenerativeAI(key);
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+                
+                uiLog('Sending prompt to Gemini model...');
 
                 const systemInstruction = `You are a career architect. Your goal is to optimize the provided resume for ATS while preserving 100% of the facts.
 Rewrite summarized sections to align with keywords in the Job Description.
@@ -365,14 +399,18 @@ Return JSON:
 
                 const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
                 const responseText = result.response.text();
+                uiLog('Received response from Gemini.', 'success');
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-                const aiData = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
+                if (!jsonMatch) throw new Error("AI did not return valid JSON. Please try again.");
+                const aiData = JSON.parse(jsonMatch[0]);
 
                 state.userName = aiData.userName;
                 state.targetTitle = aiData.targetTitle;
                 state.companyName = aiData.companyName;
 
                 updateProgress(75, 'Injecting XML');
+                uiLog('Parsing Word Document XML...');
+                if (!window.PizZip) throw new Error("PizZip library failed to load from CDN.");
                 const zip = new window.PizZip(arrayBuffer);
                 let xml = zip.file("word/document.xml").asText();
                 const parser = new DOMParser();
@@ -380,6 +418,7 @@ Return JSON:
                 const paragraphs = xmlDoc.getElementsByTagName('w:p');
 
                 const clean = (str) => str.replace(/\s+/g, ' ').trim();
+                let replacementsMade = 0;
 
                 for (let p of paragraphs) {
                     const textNodes = p.getElementsByTagName('w:t');
@@ -394,6 +433,7 @@ Return JSON:
                         if (cleanPara.includes(cleanFind)) {
                             if (paraText.includes(r.find)) paraText = paraText.replace(r.find, r.replace);
                             else if (cleanPara === cleanFind) paraText = r.replace;
+                            replacementsMade++;
                         }
                     }
 
@@ -402,23 +442,27 @@ Return JSON:
                         for (let i = textNodes.length - 1; i > 0; i--) textNodes[i].parentNode.removeChild(textNodes[i]);
                     }
                 }
+                
+                uiLog(`Successfully injected ${replacementsMade} smart replacements into your CV.`, 'success');
 
                 zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
                 state.cvBlob = zip.generate({ type: "blob" });
 
                 updateProgress(90, 'Finalizing Documents');
+                uiLog('Generating custom Cover Letter document...');
                 state.clBlob = await generateCoverLetterDoc(aiData.coverLetter, state.userName);
 
                 updateProgress(100, 'Complete');
+                uiLog('Optimization complete! Documents ready for download.', 'success');
                 setTimeout(() => {
                     elements.actionArea.classList.add('hidden');
                     elements.progressArea.classList.add('hidden');
                     elements.successArea.classList.remove('hidden');
                     toggleLoading(false);
-                }, 800);
+                }, 1000);
 
             } catch (err) {
-                alert(`Optimization Failed: ${err.message}`);
+                uiLog(`Optimization Failed: ${err.message}`, 'error');
                 toggleLoading(false);
             }
         };
