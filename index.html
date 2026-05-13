@@ -3,301 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invisible Resume Editor | Premium AI Optimization</title>
+    <title>Invisible | Minimal Resume Editor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #030712;
-            --card: rgba(17, 24, 39, 0.7);
-            --border: rgba(255, 255, 255, 0.08);
-            --accent: #3b82f6;
-            --accent-glow: rgba(59, 130, 246, 0.3);
-            --secondary: #8b5cf6;
+            --bg: #000000;
+            --surface: #0a0a0a;
+            --border: #1a1a1a;
+            --accent: #ffffff;
+            --text-secondary: #666666;
         }
 
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bg);
-            color: #f3f4f6;
-            background-image: 
-                radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.15) 0%, transparent 35%),
-                radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.15) 0%, transparent 35%);
-            background-attachment: fixed;
+            color: #ffffff;
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .glass-card {
-            background: var(--card);
-            backdrop-filter: blur(16px);
+        .minimal-card {
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 12px;
+            transition: border-color 0.3s ease;
         }
 
-        .glass-card:hover {
-            border-color: rgba(255, 255, 255, 0.15);
+        .minimal-card:hover {
+            border-color: #333333;
         }
 
-        .accent-gradient {
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), var(--secondary));
-            box-shadow: 0 0 20px var(--accent-glow);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px var(--accent-glow);
-            filter: brightness(1.1);
-        }
-
-        .input-glow {
-            background: rgba(0, 0, 0, 0.2);
+        .minimal-input {
+            background: transparent;
             border: 1px solid var(--border);
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
 
-        .input-glow:focus {
+        .minimal-input:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-glow);
             outline: none;
         }
 
-        .progress-bar {
-            background: linear-gradient(90deg, var(--accent), var(--secondary));
-            box-shadow: 0 0 10px var(--accent-glow);
-            transition: width 0.5s ease;
+        .btn-minimal {
+            background: var(--accent);
+            color: #000000;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .btn-minimal:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: scale(0.99);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            border-color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         #dropzone.active {
             border-color: var(--accent);
-            background: rgba(59, 130, 246, 0.05);
-            transform: scale(1.01);
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .faq-item {
-            border-bottom: 1px solid var(--border);
+        #dropzone.file-loaded {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.02);
         }
 
-        .faq-item:last-child {
-            border-bottom: none;
+        .progress-line {
+            height: 1px;
+            background: #1a1a1a;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
         }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #374151;
+        .progress-line-fill {
+            height: 100%;
+            background: #ffffff;
+            width: 0;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes pulse-subtle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        ::selection {
+            background: #ffffff;
+            color: #000000;
         }
-        .animate-pulse-subtle {
-            animation: pulse-subtle 2s infinite ease-in-out;
-        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
     </style>
 </head>
-<body class="py-12 px-4 md:px-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header Section -->
-        <header class="text-center mb-16">
-            <div class="inline-block px-4 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium mb-4 animate-pulse-subtle">
-                AI-Powered Professional Optimizer
-            </div>
-            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-                The <span class="accent-gradient">Invisible</span> Editor
-            </h1>
-            <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
-                Zero-touch resume optimization that preserves your formatting perfectly.
-                Optimized for high-impact roles and ATS performance.
-            </p>
+<body class="py-16 px-6">
+    <div class="max-w-2xl mx-auto">
+        <!-- Minimal Header -->
+        <header class="mb-16 text-center">
+            <h1 class="text-3xl font-light tracking-widest mb-3 uppercase">Invisible</h1>
+            <p class="text-secondary text-sm font-light">Zero-touch document optimization powered by Gemini.</p>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <!-- Left Column: Guide & FAQ -->
-            <div class="lg:col-span-4 space-y-8">
-                <!-- How to Use -->
-                <section class="glass-card p-6">
-                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        Getting Started
-                    </h3>
-                    <div class="space-y-6">
-                        <div class="flex gap-4">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">1</div>
-                            <div>
-                                <p class="font-medium mb-1">Get an API Key</p>
-                                <p class="text-sm text-slate-400 leading-snug">Visit <a href="https://aistudio.google.com/" target="_blank" class="text-blue-400 hover:underline">Google AI Studio</a> to get your free Gemini API key.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">2</div>
-                            <div>
-                                <p class="font-medium mb-1">Upload .docx</p>
-                                <p class="text-sm text-slate-400 leading-snug">Upload your existing Word resume. PDF is not supported for formatting preservation.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">3</div>
-                            <div>
-                                <p class="font-medium mb-1">Paste Job Goals</p>
-                                <p class="text-sm text-slate-400 leading-snug">Copy and paste the job description or target role details.</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 text-sm font-bold">4</div>
-                            <div>
-                                <p class="font-medium mb-1">Verify & Apply</p>
-                                <p class="text-sm text-slate-400 leading-snug italic">Always double-check the final formatting and content before submission.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- FAQ -->
-                <section class="glass-card p-6">
-                    <h3 class="text-xl font-semibold mb-6 flex items-center gap-3">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        FAQ
-                    </h3>
-                    <div class="space-y-4">
-                        <div class="faq-item pb-4">
-                            <p class="font-medium text-sm text-slate-200 mb-1">Do I need to check the file?</p>
-                            <p class="text-xs text-slate-400 italic">Crucially, yes. While the AI is expert-level, you must verify all facts, dates, and final layout before applying.</p>
-                        </div>
-                        <div class="faq-item pb-4">
-                            <p class="font-medium text-sm text-slate-200 mb-1">Will it mess up my fonts?</p>
-                            <p class="text-xs text-slate-400">No. The "Smart Swap" technology updates text nodes directly within the XML, keeping all styles intact.</p>
-                        </div>
-                        <div class="faq-item pb-4">
-                            <p class="font-medium text-sm text-slate-200 mb-1">Does it support other languages?</p>
-                            <p class="text-xs text-slate-400">It works best with English, but since Gemini is multilingual, it supports 100+ languages including Arabic, French, and Spanish.</p>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <!-- Right Column: Main App -->
-            <div class="lg:col-span-8 space-y-8">
-                <!-- Step 1: API Key -->
-                <div class="glass-card p-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-2xl font-semibold flex items-center gap-3">
-                            <span class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">1</span>
-                            Configuration
-                        </h2>
-                        <span id="apiKeyStatus" class="text-xs text-slate-500">Not Configured</span>
-                    </div>
-                    <input type="password" id="apiKey" placeholder="Enter your Gemini API Key..." 
-                           class="w-full p-4 rounded-xl input-glow text-white font-mono text-sm">
+        <main class="space-y-6">
+            <!-- API Configuration -->
+            <section class="minimal-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <label class="text-xs uppercase tracking-widest text-secondary">Gemini Key</label>
+                    <span id="apiKeyStatus" class="text-[10px] uppercase tracking-tighter text-secondary">Disconnected</span>
                 </div>
+                <input type="password" id="apiKey" placeholder="Paste Key" 
+                       class="w-full p-3 text-sm minimal-input font-mono">
+            </section>
 
-                <!-- Step 2: Files & JD -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Dropzone -->
-                    <div class="glass-card p-8 flex flex-col">
-                        <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
-                            <span class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">2</span>
-                            Upload CV
-                        </h2>
-                        <div id="dropzone" class="flex-1 border-2 border-dashed border-slate-700 rounded-2xl flex flex-col items-center justify-center p-8 cursor-pointer transition-all hover:border-blue-500/50 hover:bg-blue-500/5">
-                            <svg class="w-12 h-12 text-slate-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                            <p id="fileName" class="text-slate-400 text-center text-sm">Drop .docx here or browse</p>
-                            <input type="file" id="fileInput" accept=".docx" class="hidden">
-                        </div>
-                    </div>
-
-                    <!-- JD -->
-                    <div class="glass-card p-8">
-                        <h2 class="text-2xl font-semibold flex items-center gap-3 mb-6">
-                            <span class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">3</span>
-                            Job Goals
-                        </h2>
-                        <textarea id="jdInput" placeholder="Paste the job description or target role details..." 
-                                  class="w-full h-40 p-4 rounded-2xl input-glow text-white text-sm resize-none"></textarea>
-                    </div>
+            <!-- File Upload -->
+            <section id="dropzone" class="minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group">
+                <input type="file" id="fileInput" accept=".docx" class="hidden">
+                <div id="uploadIcon" class="mb-4 text-secondary group-hover:text-white transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 </div>
+                <p id="fileName" class="text-sm font-light text-secondary group-hover:text-white transition-colors">Select .docx Resume</p>
+                <p id="fileSubtext" class="text-[10px] uppercase mt-2 text-secondary tracking-widest">Preserves Original Formatting</p>
+            </section>
 
-                <!-- Step 3: Action -->
-                <div class="glass-card p-8">
-                    <div id="actionPrimary">
-                        <button id="optimizeBtn" class="w-full btn-primary disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl text-lg flex items-center justify-center gap-3">
-                            <span id="btnText">Optimize Everything</span>
-                            <svg id="btnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </button>
-                    </div>
+            <!-- Job Description -->
+            <section class="minimal-card p-6">
+                <label class="text-xs uppercase tracking-widest text-secondary block mb-4">Target Job Description</label>
+                <textarea id="jdInput" placeholder="Paste requirements here..." 
+                          class="w-full h-48 p-4 text-sm minimal-input resize-none font-light leading-relaxed"></textarea>
+            </section>
 
-                    <div id="actionSuccess" class="hidden space-y-6 text-center">
-                        <div class="flex flex-col items-center gap-2 mb-6">
-                            <div class="w-12 h-12 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center mb-2">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            </div>
-                            <h3 class="text-xl font-semibold">Ready for Download</h3>
-                            <p class="text-slate-400 text-sm italic">Always verify facts and formatting in Word or Google Docs before applying.</p>
-                        </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button id="downloadCvBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
-                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Download CV
-                            </button>
-                            <button id="downloadClBtn" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-3 transition-all">
-                                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                Download Cover Letter
-                            </button>
-                        </div>
-                        <button onclick="location.reload()" class="w-full text-slate-500 hover:text-slate-400 text-sm font-medium mt-4">
-                            Start New Optimization
-                        </button>
-                    </div>
-
-                    <div id="progressContainer" class="hidden mt-8">
-                        <div class="flex justify-between mb-3 text-sm">
-                            <span id="progressText" class="text-slate-400 font-medium italic">Processing...</span>
-                            <span id="progressPercent" class="text-blue-400 font-bold">0%</span>
-                        </div>
-                        <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-white/5">
-                            <div id="progressBar" class="progress-bar h-full w-0"></div>
-                        </div>
-                    </div>
+            <!-- Progress & Actions -->
+            <div id="progressArea" class="hidden space-y-4 py-4">
+                <div class="flex justify-between text-[10px] uppercase tracking-widest text-secondary">
+                    <span id="progressText">Processing</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-line">
+                    <div id="progressBar" class="progress-line-fill"></div>
                 </div>
             </div>
-        </div>
 
-        <footer class="mt-20 text-center text-slate-500 text-sm pb-12">
-            <div class="flex flex-wrap justify-center gap-4 mb-8">
-                <a href="https://kisalnelaka.github.io" target="_blank" class="px-6 py-2 rounded-full glass-card hover:bg-blue-500/10 hover:border-blue-500/50 transition-all flex items-center gap-2 text-slate-300">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
-                    Portfolio
-                </a>
-                <a href="https://github.com/kisalnelaka" target="_blank" class="px-6 py-2 rounded-full glass-card hover:bg-slate-500/10 hover:border-slate-500/50 transition-all flex items-center gap-2 text-slate-300">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    GitHub
-                </a>
-                <a href="https://www.linkedin.com/in/kisalnelaka/" target="_blank" class="px-6 py-2 rounded-full glass-card hover:bg-blue-600/10 hover:border-blue-600/50 transition-all flex items-center gap-2 text-slate-300">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    LinkedIn
-                </a>
+            <div id="actionArea">
+                <button id="optimizeBtn" class="w-full p-4 btn-minimal rounded-lg uppercase tracking-widest text-xs">
+                    Optimize Documents
+                </button>
             </div>
-            <p>© 2026 The Invisible Resume Editor. Precision document manipulation with Gemini 2.5 Flash.</p>
+
+            <!-- Success State -->
+            <div id="successArea" class="hidden space-y-6">
+                <div class="minimal-card p-8 text-center border-green-900/30">
+                    <div class="text-green-500 mb-4 inline-block">
+                        <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="text-sm uppercase tracking-widest mb-2 font-light">Optimized Files Ready</h3>
+                    <p class="text-[10px] text-secondary uppercase tracking-tighter">Verified by Gemini 2.5 Flash</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="downloadCvBtn" class="p-4 btn-secondary rounded-lg text-xs uppercase tracking-widest">CV</button>
+                    <button id="downloadClBtn" class="p-4 btn-secondary rounded-lg text-xs uppercase tracking-widest">Cover Letter</button>
+                </div>
+                
+                <button onclick="location.reload()" class="w-full text-[10px] uppercase tracking-widest text-secondary hover:text-white transition-colors py-4">
+                    Start New Process
+                </button>
+            </div>
+        </main>
+
+        <!-- Minimal Social Links -->
+        <footer class="mt-24 pt-12 border-t border-[#111111]">
+            <div class="flex justify-center gap-8 text-secondary mb-8">
+                <a href="https://kisalnelaka.github.io" target="_blank" class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">Portfolio</a>
+                <a href="https://github.com/kisalnelaka" target="_blank" class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">GitHub</a>
+                <a href="https://www.linkedin.com/in/kisalnelaka/" target="_blank" class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">LinkedIn</a>
+            </div>
+            <p class="text-center text-[10px] text-[#333333] uppercase tracking-[0.2em] font-light">
+                &copy; 2026 Invisible Architecture
+            </p>
         </footer>
     </div>
 
@@ -310,17 +203,16 @@
             dropzone: document.getElementById('dropzone'),
             fileInput: document.getElementById('fileInput'),
             fileName: document.getElementById('fileName'),
+            fileSubtext: document.getElementById('fileSubtext'),
             jdInput: document.getElementById('jdInput'),
             optimizeBtn: document.getElementById('optimizeBtn'),
-            btnText: document.getElementById('btnText'),
-            btnIcon: document.getElementById('btnIcon'),
-            progressContainer: document.getElementById('progressContainer'),
+            progressArea: document.getElementById('progressArea'),
             progressText: document.getElementById('progressText'),
             progressPercent: document.getElementById('progressPercent'),
             progressBar: document.getElementById('progressBar'),
             apiKeyStatus: document.getElementById('apiKeyStatus'),
-            actionPrimary: document.getElementById('actionPrimary'),
-            actionSuccess: document.getElementById('actionSuccess'),
+            actionArea: document.getElementById('actionArea'),
+            successArea: document.getElementById('successArea'),
             downloadCvBtn: document.getElementById('downloadCvBtn'),
             downloadClBtn: document.getElementById('downloadClBtn')
         };
@@ -338,41 +230,73 @@
         const savedKey = localStorage.getItem('gemini_api_key');
         if (savedKey) {
             elements.apiKey.value = savedKey;
-            elements.apiKeyStatus.innerText = 'Key Loaded';
-            elements.apiKeyStatus.className = 'text-xs text-green-500 font-medium';
+            updateKeyStatus(true);
         }
 
         elements.apiKey.oninput = (e) => {
             const val = e.target.value.trim();
             localStorage.setItem('gemini_api_key', val);
-            elements.apiKeyStatus.innerText = val ? 'Key Saved' : 'Not Configured';
-            elements.apiKeyStatus.className = val ? 'text-xs text-green-500 font-medium' : 'text-xs text-slate-500';
+            updateKeyStatus(!!val);
         };
 
-        // UI Interactions
-        elements.dropzone.onclick = () => elements.fileInput.click();
-        elements.fileInput.onchange = (e) => handleFile(e.target.files[0]);
+        function updateKeyStatus(hasKey) {
+            elements.apiKeyStatus.innerText = hasKey ? 'Encrypted' : 'Disconnected';
+            elements.apiKeyStatus.className = hasKey ? 'text-[10px] uppercase tracking-tighter text-green-500' : 'text-[10px] uppercase tracking-tighter text-secondary';
+        }
+
+        // --- File Upload Logic Fix ---
+        elements.dropzone.onclick = (e) => {
+            if (e.target.closest('a')) return; // Don't trigger if links clicked (not in dropzone though)
+            elements.fileInput.click();
+        };
+
+        elements.fileInput.onchange = (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        };
         
-        elements.dropzone.ondragover = (e) => { e.preventDefault(); elements.dropzone.classList.add('active'); };
+        elements.dropzone.ondragover = (e) => { 
+            e.preventDefault(); 
+            elements.dropzone.classList.add('active'); 
+        };
         elements.dropzone.ondragleave = () => elements.dropzone.classList.remove('active');
         elements.dropzone.ondrop = (e) => {
             e.preventDefault();
             elements.dropzone.classList.remove('active');
-            handleFile(e.dataTransfer.files[0]);
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
         };
 
         function handleFile(file) {
-            if (file?.name.endsWith('.docx')) {
+            if (file && file.name.toLowerCase().endsWith('.docx')) {
                 state.selectedFile = file;
                 elements.fileName.innerText = file.name;
-                elements.fileName.className = 'text-blue-400 font-semibold text-center text-sm';
+                elements.fileName.classList.add('text-white');
+                elements.fileSubtext.innerText = 'Document Ready';
+                elements.fileSubtext.classList.remove('text-secondary');
+                elements.fileSubtext.classList.add('text-green-500');
+                elements.dropzone.classList.add('file-loaded');
             } else if (file) {
-                alert('Please upload a .docx file for formatting preservation.');
+                alert('Only .docx files are supported for formatting preservation.');
+                resetUpload();
             }
         }
 
+        function resetUpload() {
+            state.selectedFile = null;
+            elements.fileName.innerText = 'Select .docx Resume';
+            elements.fileName.classList.remove('text-white');
+            elements.fileSubtext.innerText = 'Preserves Original Formatting';
+            elements.fileSubtext.classList.add('text-secondary');
+            elements.fileSubtext.classList.remove('text-green-500');
+            elements.dropzone.classList.remove('file-loaded');
+            elements.fileInput.value = '';
+        }
+
         function updateProgress(percent, text) {
-            elements.progressContainer.classList.remove('hidden');
+            elements.progressArea.classList.remove('hidden');
             elements.progressText.innerText = text;
             elements.progressPercent.innerText = `${percent}%`;
             elements.progressBar.style.width = `${percent}%`;
@@ -382,42 +306,33 @@
         elements.optimizeBtn.onclick = async () => {
             const key = elements.apiKey.value.trim();
             const jd = elements.jdInput.value.trim();
-            if (!key || !state.selectedFile || !jd) return alert('Key, File, and JD are required.');
+            
+            if (!key) return alert('API Key Required.');
+            if (!state.selectedFile) return alert('Please Select a .docx Resume.');
+            if (!jd) return alert('Please Paste Job Description.');
 
             try {
                 toggleLoading(true);
-                updateProgress(10, 'Extracting document text...');
+                updateProgress(10, 'Parsing Structure');
                 const arrayBuffer = await state.selectedFile.arrayBuffer();
                 const { value: resumeText } = await window.mammoth.extractRawText({ arrayBuffer });
 
-                updateProgress(35, 'AI drafting targeted CV and Cover Letter...');
+                updateProgress(40, 'AI Synthesis');
                 const genAI = new GoogleGenerativeAI(key);
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-                const systemInstruction = `You are an Expert Resume & Career Coach specializing in Applicant Tracking Systems (ATS). You will be given a raw text resume and a job description.
-Step 1: Rewrite the Professional Title, Summary, Skills, and Experience to match the job.
-Step 2: Compose a properly structured Cover Letter. Include a professional Salutation (e.g., "Dear Hiring Manager,"), a compelling Introduction, a specific Body Paragraph matching the JD, a professional Closing Paragraph, and a formal Letter Ending with your name (e.g., "Sincerely, [Name]").
-Step 3: Extract the user's name and determine the target job title and company name.
+                const systemInstruction = `You are a career architect. Your goal is to optimize the provided resume for ATS while preserving 100% of the facts.
+Rewrite summarized sections to align with keywords in the Job Description.
+Also generate a full Cover Letter (Salutation, Intro, Body, Closing, Signature).
 
-ATS OPTIMIZATION RULES:
-- Extract and incorporate professional links (LinkedIn, GitHub, Portfolio, Website) from the resume into the cover letter where appropriate.
-- PRIORITIZE keyword matching: Use the EXACT terminology and skills found in the Job Description.
-- Use strong action verbs (e.g., Developed, Managed, Orchestrated).
-- Rewrite bullet points using the STAR method (Situation, Task, Action, Result) where relevant.
-- Ensure the language is professional, modern, and high-impact.
-
-Return ONLY a JSON object with this structure:
+Return JSON:
 {
   "userName": "Name",
   "targetTitle": "Title",
   "companyName": "Company",
-  "cvReplacements": [{ "find": "...", "replace": "..." }],
-  "coverLetter": "Full multi-paragraph text..."
-}
-
-CRITICAL: 
-- "cvReplacements" must match EXACT paragraph blocks from the resume.
-- Maintain the user's facts but pivot the language toward the JD for maximum ATS score.`;
+  "cvReplacements": [{ "find": "original exact text", "replace": "optimized text" }],
+  "coverLetter": "Full text..."
+}`;
 
                 const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
                 const responseText = result.response.text();
@@ -428,7 +343,7 @@ CRITICAL:
                 state.targetTitle = aiData.targetTitle;
                 state.companyName = aiData.companyName;
 
-                updateProgress(70, 'Performing Smart Swaps in CV XML...');
+                updateProgress(75, 'Injecting XML');
                 const zip = new window.PizZip(arrayBuffer);
                 let xml = zip.file("word/document.xml").asText();
                 const parser = new DOMParser();
@@ -462,19 +377,19 @@ CRITICAL:
                 zip.file("word/document.xml", new XMLSerializer().serializeToString(xmlDoc));
                 state.cvBlob = zip.generate({ type: "blob" });
 
-                updateProgress(90, 'Generating Cover Letter document...');
+                updateProgress(90, 'Finalizing Documents');
                 state.clBlob = await generateCoverLetterDoc(aiData.coverLetter, state.userName);
 
-                updateProgress(100, 'All Documents Ready!');
+                updateProgress(100, 'Complete');
                 setTimeout(() => {
-                    elements.actionPrimary.classList.add('hidden');
-                    elements.actionSuccess.classList.remove('hidden');
-                    elements.progressContainer.classList.add('hidden');
+                    elements.actionArea.classList.add('hidden');
+                    elements.progressArea.classList.add('hidden');
+                    elements.successArea.classList.remove('hidden');
                     toggleLoading(false);
-                }, 1000);
+                }, 800);
 
             } catch (err) {
-                alert(`Error: ${err.message}`);
+                alert(`Optimization Failed: ${err.message}`);
                 toggleLoading(false);
             }
         };
@@ -532,7 +447,9 @@ CRITICAL:
 
         function toggleLoading(isLoading) {
             elements.optimizeBtn.disabled = isLoading;
-            elements.btnText.innerText = isLoading ? 'Processing...' : 'Optimize Everything';
+            elements.optimizeBtn.innerText = isLoading ? 'Optimizing...' : 'Optimize Documents';
+            if (isLoading) elements.optimizeBtn.style.opacity = '0.5';
+            else elements.optimizeBtn.style.opacity = '1';
         }
     </script>
 </body>
