@@ -141,17 +141,17 @@
 
             <!-- File Upload -->
             <label for="fileInput" id="dropzone"
-                class="minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group transition-all duration-300">
-                <input type="file" id="fileInput" accept=".docx" class="hidden">
-                <div id="uploadIcon" class="mb-4 text-secondary group-hover:text-white transition-colors">
+                class="relative minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group transition-all duration-300">
+                <input type="file" id="fileInput" accept=".docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" style="z-index: 10;">
+                <div id="uploadIcon" class="mb-4 text-secondary group-hover:text-white transition-colors relative z-0">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
                     </svg>
                 </div>
-                <p id="fileName" class="text-sm font-light text-secondary group-hover:text-white transition-colors">
+                <p id="fileName" class="text-sm font-light text-secondary group-hover:text-white transition-colors relative z-0">
                     Select .docx Resume</p>
-                <p id="fileSubtext" class="text-[10px] uppercase mt-2 text-secondary tracking-widest">Preserves Original
+                <p id="fileSubtext" class="text-[10px] uppercase mt-2 text-secondary tracking-widest relative z-0">Preserves Original
                     Formatting</p>
             </label>
 
@@ -225,8 +225,6 @@
 
     <!-- Logic -->
     <script type="module">
-        import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
-
         const elements = {
             apiKey: document.getElementById('apiKey'),
             dropzone: document.getElementById('dropzone'),
@@ -348,6 +346,7 @@
                 const { value: resumeText } = await window.mammoth.extractRawText({ arrayBuffer });
 
                 updateProgress(40, 'AI Synthesis');
+                const { GoogleGenerativeAI } = await import("https://esm.run/@google/generative-ai");
                 const genAI = new GoogleGenerativeAI(key);
                 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -447,12 +446,12 @@ Return JSON:
                 return \`<w:p><w:r><w:t>\${line}</w:t></w:r></w:p>\`;
             }).join('');
 
-            const finalXml = `<? xml version = "1.0" encoding = "UTF-8" standalone = "yes" ?>
+            const finalXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
                     <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
                         <w:body>
-                            <w:p><w:r><w:rPr><w:b /><w:sz w:val="28" /></w:rPr><w:t>${cleanName}</w:t></w:r></w:p>
+                            <w:p><w:r><w:rPr><w:b/><w:sz w:val="28"/></w:rPr><w:t>${cleanName}</w:t></w:r></w:p>
                             <w:p><w:r><w:t>${new Date().toLocaleDateString()}</w:t></w:r></w:p>
-                            <w:p />
+                            <w:p/>
                             ${xmlParagraphs}
                         </w:body>
                     </w:document>`;
@@ -465,14 +464,14 @@ Return JSON:
         elements.downloadCvBtn.onclick = () => {
             const name = (state.userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
             const title = (state.targetTitle || 'Optimized').replace(/[^a-z0-9]/gi, '_');
-            window.saveAs(state.cvBlob, `${ name } -${ title }.docx`);
+            window.saveAs(state.cvBlob, `${name}-${title}.docx`);
         };
 
         elements.downloadClBtn.onclick = () => {
             const name = (state.userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
             const company = (state.companyName || 'Company').replace(/[^a-z0-9]/gi, '_');
             const title = (state.targetTitle || 'Position').replace(/[^a-z0-9]/gi, '_');
-            window.saveAs(state.clBlob, `${ name } -${ company } -${ title }.docx`);
+            window.saveAs(state.clBlob, `${name}-${company}-${title}.docx`);
         };
 
         function toggleLoading(isLoading) {
