@@ -127,14 +127,14 @@
             </section>
 
             <!-- File Upload -->
-            <section id="dropzone" class="minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group">
-                <input type="file" id="fileInput" accept=".docx" class="hidden">
+            <label for="fileInput" id="dropzone" class="minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group transition-all duration-300">
+                <input type="file" id="fileInput" accept=".docx" class="opacity-0 absolute pointer-events-none">
                 <div id="uploadIcon" class="mb-4 text-secondary group-hover:text-white transition-colors">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                 </div>
                 <p id="fileName" class="text-sm font-light text-secondary group-hover:text-white transition-colors">Select .docx Resume</p>
                 <p id="fileSubtext" class="text-[10px] uppercase mt-2 text-secondary tracking-widest">Preserves Original Formatting</p>
-            </section>
+            </label>
 
             <!-- Job Description -->
             <section class="minimal-card p-6">
@@ -244,12 +244,7 @@
             elements.apiKeyStatus.className = hasKey ? 'text-[10px] uppercase tracking-tighter text-green-500' : 'text-[10px] uppercase tracking-tighter text-secondary';
         }
 
-        // --- File Upload Logic Fix ---
-        elements.dropzone.onclick = (e) => {
-            if (e.target.closest('a')) return; // Don't trigger if links clicked (not in dropzone though)
-            elements.fileInput.click();
-        };
-
+        // --- File Upload Logic ---
         elements.fileInput.onchange = (e) => {
             if (e.target.files && e.target.files.length > 0) {
                 handleFile(e.target.files[0]);
