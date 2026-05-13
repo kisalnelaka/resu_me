@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pizzip@3.1.1/dist/pizzip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
@@ -102,11 +104,21 @@
             color: #000000;
         }
 
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body class="py-16 px-6">
     <div class="max-w-2xl mx-auto">
         <!-- Minimal Header -->
@@ -120,27 +132,35 @@
             <section class="minimal-card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <label class="text-xs uppercase tracking-widest text-secondary">Gemini Key</label>
-                    <span id="apiKeyStatus" class="text-[10px] uppercase tracking-tighter text-secondary">Disconnected</span>
+                    <span id="apiKeyStatus"
+                        class="text-[10px] uppercase tracking-tighter text-secondary">Disconnected</span>
                 </div>
-                <input type="password" id="apiKey" placeholder="Paste Key" 
-                       class="w-full p-3 text-sm minimal-input font-mono">
+                <input type="password" id="apiKey" placeholder="Paste Key"
+                    class="w-full p-3 text-sm minimal-input font-mono">
             </section>
 
             <!-- File Upload -->
-            <label for="fileInput" id="dropzone" class="minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group transition-all duration-300">
-                <input type="file" id="fileInput" accept=".docx" class="opacity-0 absolute pointer-events-none">
+            <label for="fileInput" id="dropzone"
+                class="minimal-card p-10 border-dashed border-2 flex flex-col items-center justify-center cursor-pointer group transition-all duration-300">
+                <input type="file" id="fileInput" accept=".docx" class="hidden">
                 <div id="uploadIcon" class="mb-4 text-secondary group-hover:text-white transition-colors">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                    </svg>
                 </div>
-                <p id="fileName" class="text-sm font-light text-secondary group-hover:text-white transition-colors">Select .docx Resume</p>
-                <p id="fileSubtext" class="text-[10px] uppercase mt-2 text-secondary tracking-widest">Preserves Original Formatting</p>
+                <p id="fileName" class="text-sm font-light text-secondary group-hover:text-white transition-colors">
+                    Select .docx Resume</p>
+                <p id="fileSubtext" class="text-[10px] uppercase mt-2 text-secondary tracking-widest">Preserves Original
+                    Formatting</p>
             </label>
 
             <!-- Job Description -->
             <section class="minimal-card p-6">
-                <label class="text-xs uppercase tracking-widest text-secondary block mb-4">Target Job Description</label>
-                <textarea id="jdInput" placeholder="Paste requirements here..." 
-                          class="w-full h-48 p-4 text-sm minimal-input resize-none font-light leading-relaxed"></textarea>
+                <label class="text-xs uppercase tracking-widest text-secondary block mb-4">Target Job
+                    Description</label>
+                <textarea id="jdInput" placeholder="Paste requirements here..."
+                    class="w-full h-48 p-4 text-sm minimal-input resize-none font-light leading-relaxed"></textarea>
             </section>
 
             <!-- Progress & Actions -->
@@ -164,18 +184,24 @@
             <div id="successArea" class="hidden space-y-6">
                 <div class="minimal-card p-8 text-center border-green-900/30">
                     <div class="text-green-500 mb-4 inline-block">
-                        <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
                     </div>
                     <h3 class="text-sm uppercase tracking-widest mb-2 font-light">Optimized Files Ready</h3>
-                    <p class="text-[10px] text-secondary uppercase tracking-tighter">Verified by Gemini 2.5 Flash</p>
+                    <p class="text-[10px] text-secondary uppercase tracking-tighter">Verified by Gemini 1.5 Flash</p>
                 </div>
-                
+
                 <div class="grid grid-cols-2 gap-4">
-                    <button id="downloadCvBtn" class="p-4 btn-secondary rounded-lg text-xs uppercase tracking-widest">CV</button>
-                    <button id="downloadClBtn" class="p-4 btn-secondary rounded-lg text-xs uppercase tracking-widest">Cover Letter</button>
+                    <button id="downloadCvBtn"
+                        class="p-4 btn-secondary rounded-lg text-xs uppercase tracking-widest">CV</button>
+                    <button id="downloadClBtn"
+                        class="p-4 btn-secondary rounded-lg text-xs uppercase tracking-widest">Cover Letter</button>
                 </div>
-                
-                <button onclick="location.reload()" class="w-full text-[10px] uppercase tracking-widest text-secondary hover:text-white transition-colors py-4">
+
+                <button onclick="location.reload()"
+                    class="w-full text-[10px] uppercase tracking-widest text-secondary hover:text-white transition-colors py-4">
                     Start New Process
                 </button>
             </div>
@@ -184,9 +210,12 @@
         <!-- Minimal Social Links -->
         <footer class="mt-24 pt-12 border-t border-[#111111]">
             <div class="flex justify-center gap-8 text-secondary mb-8">
-                <a href="https://kisalnelaka.github.io" target="_blank" class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">Portfolio</a>
-                <a href="https://github.com/kisalnelaka" target="_blank" class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">GitHub</a>
-                <a href="https://www.linkedin.com/in/kisalnelaka/" target="_blank" class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">LinkedIn</a>
+                <a href="https://kisalnelaka.github.io" target="_blank"
+                    class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">Portfolio</a>
+                <a href="https://github.com/kisalnelaka" target="_blank"
+                    class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">GitHub</a>
+                <a href="https://www.linkedin.com/in/kisalnelaka/" target="_blank"
+                    class="text-[10px] uppercase tracking-widest hover:text-white transition-colors">LinkedIn</a>
             </div>
             <p class="text-center text-[10px] text-[#333333] uppercase tracking-[0.2em] font-light">
                 &copy; 2026 Invisible Architecture
@@ -250,14 +279,20 @@
                 handleFile(e.target.files[0]);
             }
         };
-        
-        elements.dropzone.ondragover = (e) => { 
-            e.preventDefault(); 
-            elements.dropzone.classList.add('active'); 
+
+        elements.dropzone.ondragover = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.dropzone.classList.add('active');
         };
-        elements.dropzone.ondragleave = () => elements.dropzone.classList.remove('active');
+        elements.dropzone.ondragleave = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            elements.dropzone.classList.remove('active');
+        };
         elements.dropzone.ondrop = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             elements.dropzone.classList.remove('active');
             if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
                 handleFile(e.dataTransfer.files[0]);
@@ -301,7 +336,7 @@
         elements.optimizeBtn.onclick = async () => {
             const key = elements.apiKey.value.trim();
             const jd = elements.jdInput.value.trim();
-            
+
             if (!key) return alert('API Key Required.');
             if (!state.selectedFile) return alert('Please Select a .docx Resume.');
             if (!jd) return alert('Please Paste Job Description.');
@@ -333,7 +368,7 @@ Return JSON:
                 const responseText = result.response.text();
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
                 const aiData = JSON.parse(jsonMatch ? jsonMatch[0] : responseText);
-                
+
                 state.userName = aiData.userName;
                 state.targetTitle = aiData.targetTitle;
                 state.companyName = aiData.companyName;
@@ -392,7 +427,7 @@ Return JSON:
         // --- Document Generation (Library-Free Approach) ---
         async function generateCoverLetterDoc(text, name) {
             const zip = new window.PizZip();
-            
+
             zip.file("[Content_Types].xml", `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
             <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
                 <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
@@ -412,15 +447,15 @@ Return JSON:
                 return \`<w:p><w:r><w:t>\${line}</w:t></w:r></w:p>\`;
             }).join('');
 
-            const finalXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-                <w:body>
-                    <w:p><w:r><w:rPr><w:b/><w:sz w:val="28"/></w:rPr><w:t>${cleanName}</w:t></w:r></w:p>
-                    <w:p><w:r><w:t>${new Date().toLocaleDateString()}</w:t></w:r></w:p>
-                    <w:p/>
-                    ${xmlParagraphs}
-                </w:body>
-            </w:document>`;
+            const finalXml = `<? xml version = "1.0" encoding = "UTF-8" standalone = "yes" ?>
+                    <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+                        <w:body>
+                            <w:p><w:r><w:rPr><w:b /><w:sz w:val="28" /></w:rPr><w:t>${cleanName}</w:t></w:r></w:p>
+                            <w:p><w:r><w:t>${new Date().toLocaleDateString()}</w:t></w:r></w:p>
+                            <w:p />
+                            ${xmlParagraphs}
+                        </w:body>
+                    </w:document>`;
 
             zip.file("word/document.xml", finalXml);
             return zip.generate({ type: "blob" });
@@ -430,14 +465,14 @@ Return JSON:
         elements.downloadCvBtn.onclick = () => {
             const name = (state.userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
             const title = (state.targetTitle || 'Optimized').replace(/[^a-z0-9]/gi, '_');
-            window.saveAs(state.cvBlob, `${name}-${title}.docx`);
+            window.saveAs(state.cvBlob, `${ name } -${ title }.docx`);
         };
 
         elements.downloadClBtn.onclick = () => {
             const name = (state.userName || 'Resume').replace(/[^a-z0-9]/gi, '_');
             const company = (state.companyName || 'Company').replace(/[^a-z0-9]/gi, '_');
             const title = (state.targetTitle || 'Position').replace(/[^a-z0-9]/gi, '_');
-            window.saveAs(state.clBlob, `${name}-${company}-${title}.docx`);
+            window.saveAs(state.clBlob, `${ name } -${ company } -${ title }.docx`);
         };
 
         function toggleLoading(isLoading) {
@@ -448,4 +483,5 @@ Return JSON:
         }
     </script>
 </body>
+
 </html>
