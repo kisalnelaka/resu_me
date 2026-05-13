@@ -319,7 +319,7 @@
 
                 updateProgress(40, 'AI Synthesis');
                 const genAI = new GoogleGenerativeAI(key);
-                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
                 const systemInstruction = `You are a career architect. Your goal is to optimize the provided resume for ATS while preserving 100% of the facts.
 Rewrite summarized sections to align with keywords in the Job Description.

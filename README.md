@@ -28,7 +28,7 @@ The application operates entirely within your web browser. No resume data or API
 
 ## Technical Details
 
-This project is built using Tailwind CSS for a modern interface and specialized libraries including Mammoth.js, PizZip, and docx.js. It is a client side application fully compatible with GitHub Pages.
+This project is built using Tailwind CSS for a modern interface and specialized libraries including Mammoth.js and PizZip. It uses a custom, library-free document generation engine to ensure maximum reliability and performance. It is a client-side application fully compatible with GitHub Pages.
 
 ## Important Note
 
