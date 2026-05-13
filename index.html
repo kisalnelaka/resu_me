@@ -487,7 +487,7 @@ Return JSON:
             const cleanText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             const xmlParagraphs = cleanText.split('\n').map(line => {
                 if (!line.trim()) return '<w:p/>';
-                return \`<w:p><w:r><w:t>\${line}</w:t></w:r></w:p>\`;
+                return `<w:p><w:r><w:t>${line}</w:t></w:r></w:p>`;
             }).join('');
 
             const finalXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
