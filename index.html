@@ -163,6 +163,20 @@
                     class="w-full h-48 p-4 text-sm minimal-input resize-none font-light leading-relaxed"></textarea>
             </section>
 
+            <!-- Extra Instructions -->
+            <section class="minimal-card p-6 space-y-6">
+                <div>
+                    <label class="text-xs uppercase tracking-widest text-secondary block mb-4">Resume (CV) Extra Instructions</label>
+                    <textarea id="resumeInstructions" placeholder="e.g., Emphasize leadership, keep under one page, focus on technical skills..."
+                        class="w-full h-24 p-4 text-sm minimal-input resize-none font-light leading-relaxed"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs uppercase tracking-widest text-secondary block mb-4">Cover Letter Extra Instructions</label>
+                    <textarea id="clInstructions" placeholder="e.g., Mention relocation interest, standard professional tone..."
+                        class="w-full h-24 p-4 text-sm minimal-input resize-none font-light leading-relaxed"></textarea>
+                </div>
+            </section>
+
             <!-- Progress & Actions -->
             <div id="progressArea" class="hidden space-y-4 py-4">
                 <div class="flex justify-between text-[10px] uppercase tracking-widest text-secondary">
@@ -235,6 +249,8 @@
             fileName: document.getElementById('fileName'),
             fileSubtext: document.getElementById('fileSubtext'),
             jdInput: document.getElementById('jdInput'),
+            resumeInstructions: document.getElementById('resumeInstructions'),
+            clInstructions: document.getElementById('clInstructions'),
             optimizeBtn: document.getElementById('optimizeBtn'),
             progressArea: document.getElementById('progressArea'),
             progressText: document.getElementById('progressText'),
@@ -387,6 +403,7 @@
                 const systemInstruction = `You are a career architect. Your goal is to optimize the provided resume for ATS while preserving 100% of the facts.
 Rewrite summarized sections to align with keywords in the Job Description.
 Also generate a full Cover Letter (Salutation, Intro, Body, Closing, Signature).
+CRITICAL: Do not use em dashes (—) under any circumstances in your output text. Use normal hyphens (-) or standard punctuation instead.
 
 Return JSON:
 {
@@ -397,7 +414,18 @@ Return JSON:
   "coverLetter": "Full text..."
 }`;
 
-                const result = await model.generateContent(`${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`);
+                const resumeInst = elements.resumeInstructions.value.trim();
+                const clInst = elements.clInstructions.value.trim();
+
+                let promptText = `${systemInstruction}\n\nRESUME:\n${resumeText}\n\nJD:\n${jd}`;
+                if (resumeInst) {
+                    promptText += `\n\nEXTRA INSTRUCTIONS FOR RESUME (CV) OPTIMIZATION:\n${resumeInst}`;
+                }
+                if (clInst) {
+                    promptText += `\n\nEXTRA INSTRUCTIONS FOR COVER LETTER GENERATION:\n${clInst}`;
+                }
+
+                const result = await model.generateContent(promptText);
                 const responseText = result.response.text();
                 uiLog('Received response from Gemini.', 'success');
                 const jsonMatch = responseText.match(/\{[\s\S]*\}/);
